@@ -1,0 +1,821 @@
+/* Table.css - Modern Google Sheets-like Theme */
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+}
+
+/* Container for table controls */
+.table-controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    padding: 1rem;
+    background-color: var(--card-bg);
+    border-radius: 12px;
+    box-shadow: var(--shadow-sm);
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.control-buttons {
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+}
+
+.save-status {
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.save-indicator {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+.save-indicator.save-saving {
+    background-color: var(--info-color);
+    color: white;
+    opacity: 0.9;
+}
+
+.save-indicator.save-saved {
+    background-color: var(--success-color);
+    color: white;
+}
+
+.save-indicator.save-error {
+    background-color: var(--error-color);
+    color: white;
+}
+
+/* Modern table styling */
+table {
+    border-collapse: separate;
+    border-spacing: 0;
+    width: 100%;
+    max-width: 100%;
+    margin: 0 auto 2rem;
+    background-color: var(--card-bg);
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: var(--shadow-md);
+    transition: box-shadow 0.3s ease;
+}
+
+[data-theme="dark"] table {
+    box-shadow: var(--shadow-lg);
+}
+
+th, td {
+    border-right: 1px solid var(--border-color);
+    border-bottom: 1px solid var(--border-color);
+    padding: 12px 16px;
+    text-align: left;
+    transition: all 0.2s ease;
+    position: relative;
+}
+
+th:last-child, td:last-child {
+    border-right: none;
+}
+
+th {
+    background: linear-gradient(to bottom, var(--secondary-color), var(--card-bg));
+    font-weight: 600;
+    font-size: 0.8125rem;
+    letter-spacing: 0.3px;
+    color: var(--text-color);
+    text-transform: uppercase;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    user-select: none;
+}
+
+th input {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    background-color: var(--card-bg);
+    color: var(--text-color);
+    font-size: 0.875rem;
+    transition: all 0.2s ease;
+    font-weight: normal;
+    text-transform: none;
+    letter-spacing: normal;
+}
+
+th input:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+th input::placeholder {
+    color: var(--text-color);
+    opacity: 0.5;
+}
+
+/* Action buttons in table header cell */
+.action-buttons-cell {
+    vertical-align: middle;
+    padding: 8px 12px;
+    text-align: center;
+}
+
+.action-buttons-cell button {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.8125rem;
+    white-space: nowrap;
+}
+
+/* Select all checkbox header */
+.select-all-header {
+    text-align: center;
+    vertical-align: middle;
+}
+
+.select-all-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.25rem;
+}
+
+.select-all-checkbox {
+    width: 18px !important;
+    height: 18px !important;
+    cursor: pointer;
+    accent-color: var(--primary-color);
+    transition: all 0.2s ease;
+    margin: 0;
+}
+
+.select-all-checkbox:hover {
+    transform: scale(1.1);
+}
+
+.select-all-wrapper label {
+    font-size: 0.75rem;
+    font-weight: 500;
+    cursor: pointer;
+    user-select: none;
+    margin: 0;
+    color: var(--text-color);
+    line-height: 1;
+}
+
+tr:last-child td {
+    border-bottom: none;
+}
+
+tbody tr {
+    transition: all 0.15s ease;
+}
+
+tbody tr:hover {
+    background-color: var(--secondary-color);
+}
+
+tbody tr:hover td {
+    background-color: transparent;
+}
+
+/* Cell wrapper for editable cells */
+.cell-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    position: relative;
+    width: 100%;
+}
+
+/* Editable input fields - Google Sheets style */
+.table-edit-fields {
+    width: 100%;
+    padding: 8px 12px;
+    border: 2px solid transparent;
+    border-radius: 4px;
+    background-color: transparent;
+    color: var(--text-color);
+    font-size: 0.875rem;
+    font-family: inherit;
+    transition: all 0.2s ease;
+    outline: none;
+    min-height: 36px;
+    box-sizing: border-box;
+}
+
+.table-edit-fields:hover {
+    background-color: var(--secondary-color);
+    border-color: var(--border-hover);
+}
+
+.table-edit-fields:focus {
+    background-color: var(--card-bg);
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    z-index: 1;
+}
+
+.table-edit-fields::placeholder {
+    color: var(--text-color);
+    opacity: 0.4;
+}
+
+/* Textarea styling */
+td textarea.table-edit-fields {
+    min-height: 60px;
+    resize: vertical;
+    overflow-y: auto;
+    line-height: 1.5;
+    padding: 10px 12px;
+}
+
+/* Select dropdown styling */
+td select.table-edit-fields {
+    cursor: pointer;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23666' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    padding-right: 32px;
+}
+
+td select.table-edit-fields:hover {
+    background-color: var(--secondary-color);
+}
+
+td select.table-edit-fields:focus {
+    background-color: var(--card-bg);
+}
+
+/* Cell status indicator */
+.cell-status {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    font-size: 12px;
+    flex-shrink: 0;
+    animation: fadeIn 0.2s ease;
+}
+
+.cell-status.cell-saving {
+    background-color: var(--info-color);
+    color: white;
+}
+
+.cell-status.cell-saved {
+    background-color: var(--success-color);
+    color: white;
+    animation: checkmark 0.3s ease;
+}
+
+.cell-status.cell-error {
+    background-color: var(--error-color);
+    color: white;
+    animation: shake 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.8);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+@keyframes checkmark {
+    0% {
+        transform: scale(0.8);
+    }
+    50% {
+        transform: scale(1.2);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+@keyframes shake {
+    0%, 100% {
+        transform: translateX(0);
+    }
+    25% {
+        transform: translateX(-4px);
+    }
+    75% {
+        transform: translateX(4px);
+    }
+}
+
+/* Checkbox styling */
+td input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+    accent-color: var(--primary-color);
+    transition: all 0.2s ease;
+}
+
+td input[type="checkbox"]:hover {
+    transform: scale(1.1);
+}
+
+/* Center checkbox column in entries table */
+.entry-page table th:first-child,
+.entry-page table td:first-child {
+    text-align: center;
+}
+
+/* Hide per-row actions column on desktop; used only for mobile cards */
+.entry-table .actions-header,
+.entry-table .actions-cell {
+    display: none;
+}
+
+.delete-confirm-buttons {
+    display: flex;
+    gap: 0.25rem;
+}
+
+.icon-button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 1rem;
+    padding: 0.25rem;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+}
+
+.confirm-delete-button {
+    color: var(--success-color);
+}
+
+.cancel-delete-button {
+    color: var(--error-color);
+}
+
+.icon-button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Center checkbox column in destinations table (profile view) */
+.destinations-table th:first-child,
+.destinations-table td:first-child {
+    text-align: center;
+    vertical-align: middle;
+    width: 48px;
+    max-width: 64px;
+    white-space: nowrap;
+}
+
+/* Hide actions column on desktop for destinations table */
+.destinations-table .actions-header,
+.destinations-table .actions-cell {
+    display: none;
+}
+
+/* Read-only destinations table (profile, non-owner) */
+.readonly-destinations-table {
+    width: 100%;
+    max-width: 640px;
+    margin: 0 auto 2rem;
+    table-layout: fixed;
+}
+
+.readonly-destinations-table th,
+.readonly-destinations-table td {
+    word-break: break-word;
+    overflow-wrap: anywhere;
+}
+
+/* Delete button header cell */
+.delete-button-header {
+    text-align: center;
+    vertical-align: middle;
+}
+
+.trash-button {
+    background: none;
+    border: none;
+    font-size: 1.2rem;
+    cursor: pointer;
+    padding: 0.25rem;
+    margin: 0;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    max-width: 100%;
+    overflow: hidden;
+}
+
+.trash-button:hover:not(:disabled) {
+    transform: scale(1.2);
+    filter: brightness(1.2);
+}
+
+.trash-button:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+}
+
+/* Table create entry styling */
+.table-create-entry {
+    margin-bottom: 1.5rem;
+    box-shadow: var(--shadow-sm);
+}
+
+.table-create-entry th {
+    background-color: var(--secondary-color);
+}
+
+.table-create-destination {
+    width: auto;
+    text-align: center;
+    box-shadow: var(--shadow-sm);
+}
+
+.table-create-destination th {
+    text-align: center;
+    background-color: var(--secondary-color);
+}
+
+.create-container {
+    margin-bottom: 2rem;
+    padding: 1.5rem;
+    background-color: var(--card-bg);
+    border-radius: 12px;
+    box-shadow: var(--shadow-sm);
+}
+
+.create-container h3 {
+    margin-top: 0;
+    margin-bottom: 1rem;
+    color: var(--text-color);
+    font-size: 1.25rem;
+    font-weight: 600;
+}
+
+.create-container form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+/* Mobile destination create form */
+.destination-create-mobile {
+    display: none;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.destination-input-field {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    background-color: var(--secondary-color);
+    color: var(--text-color);
+    font-size: 0.875rem;
+    box-sizing: border-box;
+}
+
+.destination-input-field:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.destination-save-button {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.destination-save-button:hover {
+    background-color: var(--primary-hover);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-md);
+}
+
+.form-actions {
+    display: flex;
+    gap: 0.75rem;
+    justify-content: center;
+    margin-top: 1rem;
+}
+
+.input-disabled {
+    background-color: var(--secondary-color);
+    color: var(--text-color);
+    opacity: 0.6;
+    border: 1px solid var(--border-color);
+    padding: 8px 12px;
+    border-radius: 6px;
+    cursor: not-allowed;
+}
+
+/* Modal-style create forms (used for entry and destination create) */
+.create-modal-overlay {
+    position: fixed;
+    inset: 0;
+    background-color: rgba(0, 0, 0, 0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 200;
+}
+
+.create-modal {
+    width: 100%;
+    max-width: 480px;
+    background-color: var(--card-bg);
+    border-radius: 12px;
+    box-shadow: var(--shadow-lg);
+    padding: 1.5rem;
+}
+
+.create-modal-field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.create-modal-field label {
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--text-color);
+}
+
+.create-modal-actions {
+    display: flex;
+    gap: 0.75rem;
+    justify-content: flex-end;
+    margin-top: 1rem;
+}
+
+/* Headings */
+h1 {
+    margin-bottom: 1.5rem;
+    margin-top: 0;
+    font-size: 2rem;
+    font-weight: 700;
+    text-align: center;
+    color: var(--text-color);
+    letter-spacing: -0.5px;
+}
+
+h2 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--text-color);
+    margin-bottom: 1rem;
+}
+
+h3 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--text-color);
+    margin-bottom: 0.75rem;
+}
+
+/* Link styling in tables */
+td a {
+    color: var(--primary-color);
+    text-decoration: none;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+td a:hover {
+    color: var(--primary-hover);
+    text-decoration: underline;
+}
+
+/* Entry page styling */
+.entry-page {
+    animation: fadeIn 0.3s ease;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    /* Card-style tables for mobile */
+    .responsive-table {
+        border: 0;
+        box-shadow: none;
+        background-color: transparent;
+    }
+
+    .responsive-table thead {
+        display: none;
+    }
+
+    .responsive-table tbody tr {
+        display: block;
+        margin-bottom: 1rem;
+        border: 1px solid var(--border-color);
+        border-radius: 12px;
+        box-shadow: var(--shadow-sm);
+        overflow: hidden;
+        background-color: var(--card-bg);
+    }
+
+    .responsive-table tbody td {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.5rem 0.75rem;
+        border-right: none;
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    .responsive-table tbody td:last-child {
+        border-bottom: none;
+    }
+
+    .responsive-table tbody td::before {
+        content: attr(data-label);
+        font-weight: 600;
+        text-transform: uppercase;
+        font-size: 0.75rem;
+        color: var(--text-color);
+        margin-right: 0.75rem;
+        flex: 0 0 auto;
+    }
+
+    .responsive-table tbody td[data-label=""]::before {
+        content: "";
+        margin-right: 0;
+    }
+
+    .responsive-table .checkbox-cell {
+        justify-content: center;
+        display: none; /* hide checkbox column in mobile card view */
+    }
+
+    /* Show actions column cells in mobile card layout */
+    .entry-table .actions-cell {
+        display: flex;
+    }
+
+    /* Push field values to the right within each row */
+    .responsive-table tbody td > *:last-child {
+        margin-left: auto;
+        text-align: right;
+    }
+
+    .table-controls {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .control-buttons {
+        justify-content: center;
+    }
+
+    /* Hide reset filters button on mobile since search is hidden */
+    .reset-filters-btn {
+        display: none;
+    }
+
+    /* Mobile destination create form */
+    .destination-create-mobile {
+        display: flex;
+    }
+
+    .table-create-destination {
+        display: none;
+    }
+
+    /* Mobile card view for destinations table */
+    .destinations-table,
+    .readonly-destinations-table {
+        border: 0;
+        box-shadow: none;
+        background-color: transparent;
+    }
+
+    .destinations-table thead,
+    .readonly-destinations-table thead {
+        display: none;
+    }
+
+    .destinations-table tbody tr,
+    .readonly-destinations-table tbody tr {
+        display: block;
+        margin-bottom: 1rem;
+        border: 1px solid var(--border-color);
+        border-radius: 12px;
+        box-shadow: var(--shadow-sm);
+        overflow: hidden;
+        background-color: var(--card-bg);
+    }
+
+    .destinations-table tbody td,
+    .readonly-destinations-table tbody td {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.75rem 1rem;
+        border-right: none;
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    .destinations-table tbody td:last-child,
+    .readonly-destinations-table tbody td:last-child {
+        border-bottom: none;
+    }
+
+    .destinations-table tbody td::before,
+    .readonly-destinations-table tbody td::before {
+        content: attr(data-label);
+        font-weight: 600;
+        text-transform: uppercase;
+        font-size: 0.75rem;
+        color: var(--text-color);
+        margin-right: 0.75rem;
+        flex: 0 0 auto;
+    }
+
+    .destinations-table tbody td[data-label=""]::before,
+    .readonly-destinations-table tbody td[data-label=""]::before {
+        content: "";
+        margin-right: 0;
+    }
+
+    /* Hide checkbox column in mobile card view */
+    .destinations-table tbody td:first-child {
+        display: none;
+    }
+
+    /* Show actions column in mobile card view */
+    .destinations-table .actions-header,
+    .destinations-table .actions-cell {
+        display: flex;
+    }
+
+    .destinations-table .actions-cell {
+        justify-content: center;
+        padding: 0.75rem;
+    }
+
+    /* Destination link styling in mobile cards */
+    .destinations-table tbody td a,
+    .readonly-destinations-table tbody td a {
+        flex: 1;
+        text-align: right;
+        color: var(--primary-color);
+        text-decoration: none;
+        font-weight: 500;
+    }
+
+    .destinations-table tbody td a:hover,
+    .readonly-destinations-table tbody td a:hover {
+        text-decoration: underline;
+    }
+}
+
+/* Smooth scrolling */
+table {
+    scroll-behavior: smooth;
+}
+
+/* Focus visible for accessibility */
+.table-edit-fields:focus-visible {
+    outline: 2px solid var(--primary-color);
+    outline-offset: 2px;
+}
