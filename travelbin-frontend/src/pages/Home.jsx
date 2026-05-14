@@ -2,7 +2,6 @@ import React from 'react';
 import {Link, Navigate} from 'react-router-dom';
 import '../styles/Home.css'
 import { useAuth } from "../components/AuthContext";
-import GoogleLoginButton from '../components/GoogleLogin';
 
 const Home = () => {
 

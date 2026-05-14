@@ -25,7 +25,7 @@ const Entry = () => {
                 // Check if current user's ID is in the permissions list
                 // JWT token from simplejwt typically has user_id field
                 // Note: user field in permissions is stored as CharField, so we need to compare as strings
-                const userId = String(user.user_id || user.id);
+                const userId = String(user.id);
                 const permissions = response.data || [];
                 const userHasPermission = permissions.some(perm => String(perm.user) === userId);
                 setHasPermissions(userHasPermission);
@@ -60,7 +60,7 @@ const Entry = () => {
             // Remove trailing slash to match backend URL pattern
             apiClient.get(`/travel/permissions/get_by_destination/${id}`)
             .then((response) => {
-                const userId = String(user.user_id || user.id);
+                const userId = String(user.id);
                 const permissions = response.data || [];
                 const userHasPermission = permissions.some(perm => String(perm.user) === userId);
                 setHasPermissions(userHasPermission);

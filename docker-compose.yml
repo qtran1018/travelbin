@@ -8,6 +8,8 @@ services:
       POSTGRES_DB: travelbin
       POSTGRES_USER: travelbin
       POSTGRES_PASSWORD: travelbin
+    ports:
+      - "5433:5432"
     volumes:
       - travelbin_pgdata:/var/lib/postgresql/data
     healthcheck:
@@ -20,13 +22,13 @@ services:
       - travelplatform-network
     
   travelbin-backend:
-    build: ./Teyvat
+    build: ./travelbin-backend
     container_name: travelbin-backend
     depends_on:
       travelbin-db:
         condition: service_healthy
     ports:
-      - "8280:8000"
+      - "8000:8000"
     environment:
       POSTGRES_DB: travelbin
       POSTGRES_USER: travelbin

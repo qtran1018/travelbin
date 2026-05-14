@@ -1,4 +1,4 @@
-import {Link} from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { useAuth } from "./AuthContext";
 import logo from "../assets/logo.png";
 import '../styles/Navbar.css'
@@ -6,7 +6,7 @@ import ThemeToggleButton from './ThemeToggleButton';
 import { useState, useEffect, useRef } from 'react';
 
 export function Navbar() {
-    const { user, logout } = useAuth();
+    const { user, login, register, logout } = useAuth();
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const menuRef = useRef(null);
     const hamburgerRef = useRef(null);
@@ -68,9 +68,9 @@ export function Navbar() {
                         </Link>
 
                         {!user && (
-                            <Link className="navbar-brand" to="/register" onClick={closeMenu}>
-                                <button className="navbar-button" type="button">Register</button>
-                            </Link>
+                            <button className="navbar-button" type="button" onClick={() => { closeMenu(); register(); }}>
+                                Register
+                            </button>
                         )}
 
                         {user && (
@@ -84,9 +84,9 @@ export function Navbar() {
                                 Logout
                             </button>
                         ) : (
-                            <Link to="/login" onClick={closeMenu}>
-                                <button className="navbar-button" type="button">Log In</button>
-                            </Link>
+                            <button className="navbar-button" type="button" onClick={() => { login(); closeMenu(); }}>
+                                Log In
+                            </button>
                         )}
 
                         <div className="navbar-theme-toggle" onClick={closeMenu}>
