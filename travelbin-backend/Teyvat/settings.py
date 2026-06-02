@@ -26,7 +26,10 @@ SECRET_KEY = 'django-insecure-*ba^c%!mo3-k#_ev#9va4sgm2=uj4)-k793ddaiisiswougjcn
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = os.environ.get(
+    'ALLOWED_HOSTS',
+    'localhost,127.0.0.1,travelbin-backend,0.0.0.0'
+).split(',')
 
 
 # Application definition
@@ -69,10 +72,41 @@ REST_FRAMEWORK = {
         'anon': '10/minute',
         'user': '200/hour',
     },
+    'EXCEPTION_HANDLER': 'Traveler.exceptions.custom_exception_handler',
+}
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'standard': {
+            'format': '%(asctime)s [%(levelname)s] %(name)s: %(message)s',
+        },
+    },
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+            'formatter': 'standard',
+        },
+    },
+    'root': {
+        'handlers': ['console'],
+        'level': 'WARNING',
+    },
+    'loggers': {
+        'Traveler': {
+            'handlers': ['console'],
+            'level': 'INFO',
+            'propagate': False,
+        },
+    },
 }
 
 # Keycloak
-KEYCLOAK_ISSUER = 'http://localhost:8180/realms/travel-platform'
+KEYCLOAK_ISSUER = os.getenv('KEYCLOAK_ISSUER', 'http://localhost:8180/realms/travel-platform')
+# In Docker, point JWKS fetches at the internal container name so the backend can reach Keycloak,
+# while KEYCLOAK_ISSUER stays as the public URL to match the iss claim in tokens.
+KEYCLOAK_JWKS_URL = os.getenv('KEYCLOAK_JWKS_URL') or None
 
 #CORS_ALLOW_ALL_ORIGINS = True
 CORS_ALLOWED_ORIGINS = [

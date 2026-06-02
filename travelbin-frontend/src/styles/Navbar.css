@@ -55,34 +55,74 @@
     white-space: nowrap;
 }
 
-.navbar-brand {
+.navbar-brand-section {
     text-decoration: none;
+    color: inherit;
 }
 
-.navbar-button {
-    background-color: var(--primary-color);
-    color: white;
-    border: none;
-    padding: 0.625rem 1.25rem;
-    border-radius: 8px;
-    cursor: pointer;
+/* Nav links (Home, Profile) — transparent until hovered or active */
+.navbar-link {
+    padding: 0.375rem 0.75rem;
     font-size: 0.875rem;
     font-weight: 500;
-    transition: all 0.2s ease;
-    box-shadow: var(--shadow-sm);
+    color: var(--text-color);
     text-decoration: none;
-    display: inline-block;
+    border-radius: 6px;
+    transition: background-color 0.15s ease, color 0.15s ease;
+    white-space: nowrap;
 }
 
-.navbar-button:hover {
-    background-color: var(--primary-hover);
-    transform: translateY(-1px);
-    box-shadow: var(--shadow-md);
+.navbar-link:hover {
+    background-color: var(--secondary-color);
+    color: var(--primary-color);
 }
 
-.navbar-button:active {
-    transform: translateY(0);
-    box-shadow: var(--shadow-sm);
+.navbar-link--active {
+    color: var(--primary-color);
+    background-color: color-mix(in srgb, var(--primary-color) 12%, transparent);
+}
+
+.navbar-link--active:hover {
+    background-color: color-mix(in srgb, var(--primary-color) 18%, transparent);
+}
+
+/* Action buttons (Login, Logout, Register) */
+.navbar-btn {
+    padding: 0.375rem 0.875rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+    white-space: nowrap;
+    margin: 0;
+    box-shadow: none;
+}
+
+.navbar-btn--ghost {
+    background: transparent;
+    color: var(--text-color);
+    border: 1px solid transparent;
+}
+
+.navbar-btn--ghost:hover:not(:disabled) {
+    background-color: var(--secondary-color);
+    color: var(--primary-color);
+    transform: none;
+    box-shadow: none;
+}
+
+.navbar-btn--primary {
+    background-color: var(--primary-color);
+    color: #fff;
+    border: 1px solid var(--primary-color);
+}
+
+.navbar-btn--primary:hover:not(:disabled) {
+    filter: brightness(1.1);
+    transform: none;
+    box-shadow: none;
+    background-color: var(--primary-color);
 }
 
 hr {
@@ -186,15 +226,13 @@ hr {
         display: flex;
     }
     
-    .navbar-actions .navbar-brand {
-        width: 100%;
-    }
-    
-    .navbar-actions .navbar-button {
+    .navbar-actions .navbar-link,
+    .navbar-actions .navbar-btn {
         width: 100%;
         text-align: right;
         padding: 0.75rem 1rem;
-        font-size: 0.875rem;
+        font-size: 0.9375rem;
+        border-radius: 8px;
     }
     
     .navbar-theme-toggle {

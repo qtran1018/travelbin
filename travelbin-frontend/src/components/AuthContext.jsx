@@ -5,6 +5,7 @@ const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
+    const [authLoading, setAuthLoading] = useState(true);
     const initialized = useRef(false);
 
     useEffect(() => {
@@ -39,23 +40,24 @@ export const AuthProvider = ({ children }) => {
                         sub: keycloak.tokenParsed?.sub,
                     });
                 }
+                setAuthLoading(false);
             })
-            .catch(() => {});
+            .catch(() => { setAuthLoading(false); });
 
         keycloak.onTokenExpired = () => {
             keycloak.updateToken(60).catch(() => setUser(null));
         };
     }, []);
 
-    const login = () => keycloak.login({ redirectUri: window.location.origin });
+    const login = (redirectUri = window.location.origin) => keycloak.login({ redirectUri });
 
-    const register = () => keycloak.register({ redirectUri: window.location.origin });
+    const register = (redirectUri = window.location.origin) => keycloak.register({ redirectUri });
 
     const logout = () =>
         keycloak.logout({ redirectUri: window.location.origin });
 
     return (
-        <AuthContext.Provider value={{ user, login, register, logout, keycloak }}>
+        <AuthContext.Provider value={{ user, authLoading, login, register, logout, keycloak }}>
             {children}
         </AuthContext.Provider>
     );

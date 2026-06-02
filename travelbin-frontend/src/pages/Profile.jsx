@@ -1,38 +1,34 @@
-import React, {useState} from "react";
+import React, { useState } from "react";
 import { useParams } from "react-router-dom";
 import DestinationShow from "../components/DestinationShow";
-import DestinationCreate from "../components/DestinationCreate";
 import { useAuth } from "../components/AuthContext";
+import '../styles/Profile.css';
 
 const Profile = () => {
-    const {user} = useAuth();
-    const { id } = useParams(); // Get the ID from the URL parameters
+    const { user } = useAuth();
+    const { id } = useParams();
     const [refresh, setRefresh] = useState(false);
-    const handleDestinationCreated = () => {
-        setRefresh(prevState => !prevState);
-    }
 
-    const loggedInCanEdit = (
-        <>
-            <div className="table-side-by-side">
-            <DestinationCreate urlID={id} onDestinationCreated={handleDestinationCreated}/>
-            <DestinationShow  urlID={id} refresh={refresh} onRefresh={handleDestinationCreated}/>
-            </div>
-        </>
-    )
-    const cannotEdit = (
-        <>
-            <DestinationShow  urlID={id} refresh={refresh} onRefresh={handleDestinationCreated}/>
-        </>
-    )
+    const isOwner = user && user.username === id;
+    const displayName = id.charAt(0).toUpperCase() + id.slice(1);
 
     return (
-        <div>
-            <h1>{id.charAt(0).toUpperCase() + id.slice(1)}'s Profile</h1>
-            <h1>Destinations</h1>
-            {user && user.username === id ? loggedInCanEdit : cannotEdit}
+        <div className="profile-page">
+            <div className="profile-header">
+                <div className="profile-avatar">{id.charAt(0).toUpperCase()}</div>
+                <div className="profile-meta">
+                    <h1 className="profile-username">{displayName}</h1>
+                    {isOwner && <span className="profile-badge">Your profile</span>}
+                </div>
+            </div>
+            <DestinationShow
+                urlID={id}
+                refresh={refresh}
+                onRefresh={() => setRefresh(p => !p)}
+                canCreate={isOwner}
+            />
         </div>
-    )
+    );
 };
 
 export default Profile;

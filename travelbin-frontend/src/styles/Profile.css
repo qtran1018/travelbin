@@ -1,0 +1,452 @@
+/* ── Profile page ─────────────────────────────────────────── */
+.profile-page {
+    max-width: 680px;
+    margin: 0 auto;
+    padding: 2rem 1.5rem 4rem;
+}
+
+/* ── Profile header ───────────────────────────────────────── */
+.profile-header {
+    display: flex;
+    align-items: center;
+    gap: 1.125rem;
+    margin-bottom: 2rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.profile-avatar {
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    background-color: var(--primary-color);
+    color: #fff;
+    font-size: 1.375rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    letter-spacing: 0;
+    user-select: none;
+}
+
+.profile-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+}
+
+.profile-username {
+    font-size: 1.375rem;
+    font-weight: 700;
+    color: var(--text-color);
+    margin: 0;
+    text-align: left;
+    letter-spacing: -0.25px;
+    line-height: 1.2;
+}
+
+.profile-badge {
+    display: inline-block;
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: var(--primary-color);
+    background-color: color-mix(in srgb, var(--primary-color) 12%, transparent);
+    padding: 0.175rem 0.55rem;
+    border-radius: 99px;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+}
+
+/* ── Destinations card ────────────────────────────────────── */
+.destinations-section {
+    background-color: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: var(--shadow-sm);
+}
+
+/* Section header row */
+.destinations-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.875rem 1.125rem;
+    border-bottom: 1px solid var(--border-color);
+    gap: 0.75rem;
+    flex-wrap: wrap;
+}
+
+.destinations-header-left {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-shrink: 0;
+}
+
+.destinations-title {
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--text-color);
+    opacity: 0.6;
+}
+
+.destinations-count {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--primary-color);
+    background-color: color-mix(in srgb, var(--primary-color) 12%, transparent);
+    padding: 0.1rem 0.45rem;
+    border-radius: 99px;
+    line-height: 1.6;
+}
+
+.destinations-header-right {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex: 1;
+    justify-content: flex-end;
+}
+
+.destinations-search {
+    padding: 0.375rem 0.75rem;
+    font-size: 0.875rem;
+    background-color: var(--secondary-color);
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    color: var(--text-color);
+    width: 160px;
+    transition: border-color 0.15s ease, width 0.2s ease, box-shadow 0.15s ease;
+}
+
+.destinations-search:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary-color) 15%, transparent);
+    width: 210px;
+}
+
+.destinations-search::placeholder {
+    color: var(--text-color);
+    opacity: 0.4;
+}
+
+.dest-new-btn {
+    padding: 0.375rem 0.875rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    background: transparent;
+    color: var(--primary-color);
+    border: 1px solid var(--primary-color);
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.15s ease, color 0.15s ease;
+    white-space: nowrap;
+    margin: 0;
+    box-shadow: none;
+}
+
+.dest-new-btn:hover:not(:disabled) {
+    background-color: var(--primary-color);
+    color: #fff;
+    transform: none;
+    box-shadow: none;
+}
+
+/* ── Inline create form ───────────────────────────────────── */
+.dest-create-form {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.125rem;
+    border-bottom: 1px solid var(--border-color);
+    background-color: color-mix(in srgb, var(--primary-color) 4%, var(--card-bg));
+}
+
+.dest-create-input {
+    flex: 1;
+    padding: 0.5rem 0.75rem;
+    font-size: 0.9375rem;
+    background-color: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    color: var(--text-color);
+    min-width: 0;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.dest-create-input:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary-color) 15%, transparent);
+}
+
+.dest-create-input::placeholder {
+    opacity: 0.4;
+}
+
+.dest-create-actions {
+    display: flex;
+    gap: 0.375rem;
+    flex-shrink: 0;
+}
+
+.dest-create-save {
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    background-color: var(--primary-color);
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    margin: 0;
+    box-shadow: none;
+}
+
+.dest-create-save:hover:not(:disabled) {
+    filter: brightness(1.1);
+    transform: none;
+    box-shadow: none;
+}
+
+.dest-create-save:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+    background-color: var(--primary-color);
+    color: #fff;
+}
+
+.dest-create-cancel {
+    padding: 0.5rem 0.875rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    background: transparent;
+    color: var(--text-color);
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    cursor: pointer;
+    margin: 0;
+    box-shadow: none;
+}
+
+.dest-create-cancel:hover:not(:disabled) {
+    background-color: var(--secondary-color);
+    transform: none;
+    box-shadow: none;
+}
+
+/* ── Destination rows ─────────────────────────────────────── */
+.destination-row {
+    display: flex;
+    align-items: center;
+    border-bottom: 1px solid var(--border-color);
+    transition: background-color 0.12s ease;
+}
+
+.destination-row:last-child {
+    border-bottom: none;
+}
+
+.destination-row:hover {
+    background-color: var(--secondary-color);
+}
+
+.destination-link {
+    display: flex;
+    align-items: center;
+    flex: 1;
+    padding: 0.9rem 1.125rem;
+    color: var(--text-color);
+    text-decoration: none;
+    gap: 0.5rem;
+    min-width: 0;
+}
+
+.destination-name {
+    flex: 1;
+    font-size: 0.9375rem;
+    font-weight: 500;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    transition: color 0.12s ease;
+}
+
+.destination-row:hover .destination-name {
+    color: var(--primary-color);
+}
+
+.destination-arrow {
+    color: var(--primary-color);
+    font-size: 0.9rem;
+    opacity: 0;
+    flex-shrink: 0;
+    transition: transform 0.15s ease, opacity 0.15s ease;
+}
+
+.destination-row:hover .destination-arrow {
+    opacity: 0.7;
+    transform: translateX(2px);
+}
+
+.destination-actions {
+    display: flex;
+    align-items: center;
+    padding: 0 0.75rem 0 0;
+    gap: 0.25rem;
+    flex-shrink: 0;
+}
+
+.dest-action-btn {
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: none;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.875rem;
+    padding: 0;
+    margin: 0;
+    box-shadow: none;
+    transition: background-color 0.12s ease, opacity 0.12s ease;
+    color: var(--text-color);
+    opacity: 0;
+}
+
+.destination-row:hover .dest-action-btn {
+    opacity: 0.4;
+}
+
+.destination-row:hover .dest-action-btn:hover {
+    opacity: 1;
+    transform: none;
+    box-shadow: none;
+}
+
+.dest-rename-btn:hover:not(:disabled) {
+    background-color: color-mix(in srgb, var(--primary-color) 10%, transparent);
+    color: var(--primary-color);
+}
+
+.dest-delete-btn:hover:not(:disabled) {
+    background-color: color-mix(in srgb, var(--error-color) 12%, transparent);
+    color: var(--error-color);
+}
+
+.dest-rename-form {
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+    flex: 1;
+    min-width: 0;
+}
+
+.dest-rename-input {
+    flex: 1;
+    min-width: 0;
+    padding: 0.3rem 0.6rem;
+    font-size: 0.9rem;
+    border: 1.5px solid var(--primary-color);
+    border-radius: 6px;
+    background: var(--secondary-color);
+    color: var(--text-color);
+    outline: none;
+}
+
+.dest-rename-form .dest-confirm-btn,
+.dest-rename-form .dest-cancel-btn {
+    opacity: 1 !important;
+}
+
+.dest-confirm-btn {
+    color: var(--success-color) !important;
+    opacity: 1 !important;
+}
+
+.dest-confirm-btn:hover:not(:disabled) {
+    background-color: color-mix(in srgb, var(--success-color) 12%, transparent);
+}
+
+.dest-cancel-btn {
+    color: var(--error-color) !important;
+    opacity: 1 !important;
+}
+
+.dest-cancel-btn:hover:not(:disabled) {
+    background-color: color-mix(in srgb, var(--error-color) 12%, transparent);
+}
+
+/* Empty state */
+.destinations-empty {
+    padding: 3rem 1.5rem;
+    text-align: center;
+    color: var(--text-color);
+    opacity: 0.45;
+    font-size: 0.9375rem;
+}
+
+/* ── Mobile ───────────────────────────────────────────────── */
+@media (max-width: 600px) {
+    .profile-page {
+        padding: 1.5rem 1rem 3rem;
+    }
+
+    .profile-header {
+        margin-bottom: 1.5rem;
+    }
+
+    .profile-avatar {
+        width: 44px;
+        height: 44px;
+        font-size: 1.125rem;
+    }
+
+    .profile-username {
+        font-size: 1.125rem;
+    }
+
+    .destinations-header {
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+
+    .destinations-header-right {
+        width: 100%;
+    }
+
+    .destinations-search {
+        flex: 1;
+        width: auto;
+    }
+
+    .destinations-search:focus {
+        width: auto;
+    }
+
+    .dest-create-form {
+        flex-wrap: wrap;
+    }
+
+    .dest-create-actions {
+        width: 100%;
+    }
+
+    .dest-create-save,
+    .dest-create-cancel {
+        flex: 1;
+    }
+
+    /* Always show delete on touch devices */
+    .dest-action-btn {
+        opacity: 0.45;
+    }
+}

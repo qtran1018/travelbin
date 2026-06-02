@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom';
+import { NavLink, Link } from 'react-router-dom';
 import { useAuth } from "./AuthContext";
 import logo from "../assets/logo.png";
 import '../styles/Navbar.css'
@@ -44,10 +44,10 @@ export function Navbar() {
         <>
             <nav className="navbar navbar-expand-lg navbar-light bg-light">
                 <div className="container-fluid">
-                    <div className="navbar-brand-section">
+                    <Link to="/" className="navbar-brand-section">
                         <img src={logo} alt="Logo" className="logo-main" />
                         <span className="navbar-title">TravelBin</span>
-                    </div>
+                    </Link>
 
                     <button 
                         ref={hamburgerRef}
@@ -63,28 +63,28 @@ export function Navbar() {
                     </button>
 
                     <div ref={menuRef} className={`navbar-actions ${isMenuOpen ? 'open' : ''}`}>
-                        <Link className="navbar-brand" to="/" onClick={closeMenu}>
-                            <button className="navbar-button" type="button">Home</button>
-                        </Link>
+                        {user && (
+                            <NavLink
+                                to={`/u/${user.username}`}
+                                className={({ isActive }) => 'navbar-link' + (isActive ? ' navbar-link--active' : '')}
+                                onClick={closeMenu}
+                            >
+                                Profile
+                            </NavLink>
+                        )}
 
                         {!user && (
-                            <button className="navbar-button" type="button" onClick={() => { closeMenu(); register(); }}>
+                            <button className="navbar-btn navbar-btn--ghost" type="button" onClick={() => { closeMenu(); register(); }}>
                                 Register
                             </button>
                         )}
 
-                        {user && (
-                            <Link className="navbar-brand" to={`/u/${user.username}`} onClick={closeMenu}>
-                                <button className="navbar-button" type="button">Profile</button>
-                            </Link>
-                        )}
-
                         {user ? (
-                            <button className="navbar-button" type="button" onClick={() => { logout(); closeMenu(); }}>
+                            <button className="navbar-btn navbar-btn--ghost" type="button" onClick={() => { logout(); closeMenu(); }}>
                                 Logout
                             </button>
                         ) : (
-                            <button className="navbar-button" type="button" onClick={() => { login(); closeMenu(); }}>
+                            <button className="navbar-btn navbar-btn--primary" type="button" onClick={() => { login(); closeMenu(); }}>
                                 Log In
                             </button>
                         )}

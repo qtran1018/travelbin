@@ -92,7 +92,7 @@ th:last-child, td:last-child {
 }
 
 th {
-    background: linear-gradient(to bottom, var(--secondary-color), var(--card-bg));
+    background: var(--secondary-color);
     font-weight: 600;
     font-size: 0.8125rem;
     letter-spacing: 0.3px;
@@ -237,13 +237,15 @@ tbody tr:hover td {
     opacity: 0.4;
 }
 
-/* Textarea styling */
+/* Textarea styling — auto-sizes to content, no fixed height */
 td textarea.table-edit-fields {
-    min-height: 60px;
-    resize: vertical;
-    overflow-y: auto;
+    min-height: unset;
+    height: auto;
+    resize: none;
+    overflow: hidden;
     line-height: 1.5;
-    padding: 10px 12px;
+    padding: 8px 12px;
+    vertical-align: top;
 }
 
 /* Select dropdown styling */
@@ -807,6 +809,69 @@ td a:hover {
     .readonly-destinations-table tbody td a:hover {
         text-decoration: underline;
     }
+}
+
+/* Name and Location column widths */
+.entry-table .col-name,
+.entry-table .col-location {
+    min-width: 180px;
+}
+
+/* Inline new-entry row */
+.new-entry-row td {
+    background-color: var(--secondary-color);
+    border-left: 3px solid var(--primary-color);
+    border-bottom: none;
+}
+
+.new-entry-row td:first-child {
+    border-left: 3px solid var(--primary-color);
+}
+
+.new-entry-row .table-edit-fields::placeholder {
+    opacity: 0.55;
+    font-style: italic;
+}
+
+.new-entry-name-error {
+    border-color: var(--error-color) !important;
+    animation: shake 0.3s ease;
+}
+
+/* Always show the + button column in the new-entry row */
+.new-entry-actions {
+    display: table-cell !important;
+    text-align: center;
+    vertical-align: middle;
+}
+
+.add-entry-btn {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: 2px solid var(--primary-color);
+    background: none;
+    color: var(--primary-color);
+    font-size: 1.25rem;
+    line-height: 1;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    padding: 0;
+    flex-shrink: 0;
+}
+
+.add-entry-btn:hover:not(:disabled) {
+    background-color: var(--primary-color);
+    color: white;
+    transform: scale(1.1);
+}
+
+.add-entry-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
 }
 
 /* Smooth scrolling */

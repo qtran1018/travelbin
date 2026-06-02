@@ -1,0 +1,136 @@
+.invite-page {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 70vh;
+    padding: 2rem;
+    animation: fadeIn 0.4s ease;
+}
+
+.invite-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    box-shadow: var(--shadow-xl);
+    padding: 3rem 2.5rem;
+    max-width: 440px;
+    width: 100%;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.invite-icon {
+    font-size: 3rem;
+    line-height: 1;
+    margin-bottom: 0.5rem;
+    display: block;
+}
+
+.invite-icon--spin {
+    animation: pulse 1.4s ease-in-out infinite;
+}
+
+.invite-title {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--text-color);
+    margin: 0.25rem 0 0;
+    letter-spacing: -0.3px;
+}
+
+.invite-subtitle {
+    font-size: 1rem;
+    color: var(--text-color);
+    opacity: 0.7;
+    margin: 0.25rem 0;
+    line-height: 1.5;
+}
+
+.invite-subtitle--error {
+    color: var(--error-color);
+    opacity: 1;
+}
+
+.invite-destination {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--primary-color);
+    margin: 0.25rem 0 1rem;
+    padding: 0.5rem 1.25rem;
+    background: color-mix(in srgb, var(--primary-color) 10%, transparent);
+    border-radius: 8px;
+    border: 1px solid color-mix(in srgb, var(--primary-color) 25%, transparent);
+}
+
+.invite-loading {
+    color: var(--text-color);
+    opacity: 0.6;
+    margin: 0;
+}
+
+.invite-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    width: 100%;
+    margin-top: 0.75rem;
+}
+
+.invite-btn {
+    width: 100%;
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    transition: background-color 0.15s ease, transform 0.1s ease, box-shadow 0.15s ease;
+}
+
+.invite-btn:active {
+    transform: translateY(1px);
+}
+
+.invite-btn--primary {
+    background: var(--primary-color);
+    color: #fff;
+    box-shadow: var(--shadow-sm);
+}
+
+.invite-btn--primary:hover {
+    background: var(--primary-hover);
+    box-shadow: var(--shadow-md);
+}
+
+.invite-btn--secondary {
+    background: var(--secondary-color);
+    color: var(--text-color);
+    border: 1px solid var(--border-color);
+}
+
+.invite-btn--secondary:hover {
+    border-color: var(--border-hover);
+    background: var(--button-bg);
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(12px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50%       { transform: scale(1.15); }
+}
+
+@media (max-width: 480px) {
+    .invite-card {
+        padding: 2rem 1.5rem;
+    }
+    .invite-title {
+        font-size: 1.5rem;
+    }
+}

@@ -5,7 +5,7 @@ import EntryDelete from "./EntryDelete";
 import { useAuth } from "../components/AuthContext";
 import API_BASE_URL, { apiClient } from "../config/api";
 
-const EntryShow = ({urlID, refresh, onRefresh, hasPermissions = false}) => {
+const EntryShow = ({urlID, refresh, onRefresh, hasPermissions = false, extraControls = null}) => {
     const {user} = useAuth();
     const id = urlID // Get the ID from the URL parameters
     const [data, setData] = useState([]);
@@ -18,31 +18,69 @@ const EntryShow = ({urlID, refresh, onRefresh, hasPermissions = false}) => {
     const [searchNotes, setSearchNotes] = useState("");
     const [searchContributor, setSearchContributor] = useState("");
 
+    const [newEntry, setNewEntry] = useState({ name: '', type: '', location: '', date: '', notes: '' });
+
+    // Auto-size a textarea to its content
+    const resizeTextarea = (el) => {
+        if (!el) return;
+        el.style.height = 'auto';
+        el.style.height = `${el.scrollHeight}px`;
+    };
+
+    const handleResize = (e) => resizeTextarea(e.target);
+    const [nameError, setNameError] = useState(false);
+    const [creating, setCreating] = useState(false);
+
     const [selectedItems, setSelectedItems] = useState([]);
-    const [savingStatus, setSavingStatus] = useState({}); // Track saving status per item
+    const [savingStatus, setSavingStatus] = useState({});
     const [confirmDeleteId, setConfirmDeleteId] = useState(null);
     const [deletingId, setDeletingId] = useState(null);
-    const saveTimeouts = useRef({}); // Store debounce timeouts per field
+    const saveTimeouts = useRef({});
+    const pollInterval = useRef(null);
 
-    useEffect(() => {
-        // Fetch data from the Django REST API
+    const fetchEntries = useCallback((isInitial = false) => {
         apiClient.get(`/travel/d/${id}/`)
             .then((response) => {
-                setData(response.data);
-                setOriginalData(response.data);
+                const fresh = response.data;
+                if (isInitial) {
+                    setData(fresh);
+                    setOriginalData(fresh);
+                } else {
+                    // Merge: skip items that have a pending debounced save to avoid
+                    // overwriting what the user is currently typing
+                    setData(prev => {
+                        const prevMap = Object.fromEntries(prev.map(p => [p.id, p]));
+                        return fresh.map(freshItem => {
+                            const hasPending = Object.keys(saveTimeouts.current)
+                                .some(key => key.startsWith(`${freshItem.id}-`));
+                            return hasPending ? (prevMap[freshItem.id] ?? freshItem) : freshItem;
+                        });
+                    });
+                    setOriginalData(fresh);
+                }
             })
-            .catch((error) => {
-                console.error("Error fetching data:", error)
-            });
-    }, [id, refresh]);
+            .catch((error) => console.error("Error fetching entries:", error));
+    }, [id]);
 
-    // Cleanup timeouts on unmount
+    // Initial load + polling every 10s (paused when tab is hidden)
     useEffect(() => {
+        fetchEntries(true);
+
+        pollInterval.current = setInterval(() => {
+            if (!document.hidden) fetchEntries(false);
+        }, 10000);
+
         return () => {
-            Object.values(saveTimeouts.current).forEach(timeout => clearTimeout(timeout));
+            clearInterval(pollInterval.current);
+            Object.values(saveTimeouts.current).forEach(clearTimeout);
         };
-    }, []);
+    }, [id, refresh, fetchEntries]);
     
+    // Resize every textarea in the table after data changes
+    useEffect(() => {
+        document.querySelectorAll('td textarea.table-edit-fields').forEach(resizeTextarea);
+    }, [data]);
+
     const filteredData = data.filter((item) => {
         const nameMatch = !searchName || item.name?.toLowerCase().includes(searchName.toLowerCase());
         const typeMatch = !searchType || item.type?.toLowerCase().includes(searchType.toLowerCase());
@@ -95,8 +133,7 @@ const EntryShow = ({urlID, refresh, onRefresh, hasPermissions = false}) => {
 
     // Auto-save function with debouncing
     const autoSave = useCallback(async (itemId, field, value) => {
-        const token = localStorage.getItem("access");
-        if (!token) return; // Skip if no token (user logged out)
+        if (!user) return;
 
         setSavingStatus(prev => ({ ...prev, [itemId]: "saving" }));
 
@@ -157,10 +194,40 @@ const EntryShow = ({urlID, refresh, onRefresh, hasPermissions = false}) => {
         }
     };
 
+    const handleCreate = async () => {
+        if (!newEntry.name.trim()) {
+            setNameError(true);
+            return;
+        }
+        setCreating(true);
+        try {
+            await apiClient.post(`/travel/d/${id}/create_entry/`, {
+                ...newEntry,
+                type: newEntry.type || 'Other',
+                date: newEntry.date || null,
+                contributor: user.username,
+                destination: id,
+            });
+            setNewEntry({ name: '', type: '', location: '', date: '', notes: '' });
+            onRefresh();
+        } catch (error) {
+            console.error('Error creating entry:', error);
+        } finally {
+            setCreating(false);
+        }
+    };
+
+    const handleNewEntryKeyDown = (e) => {
+        if (e.key === 'Enter') handleCreate();
+    };
+
     const loggedInCanEdit = (
         <>
         <div style={{ marginBottom: '1rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.75rem' }}>
-            <button type="button" className="btn-secondary reset-filters-btn" onClick={reset}>Reset filters</button>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
+                <button type="button" className="btn-secondary reset-filters-btn" onClick={reset}>Reset filters</button>
+                {extraControls}
+            </div>
             {Object.keys(savingStatus).length > 0 && (
                 <div className="save-status">
                     {Object.entries(savingStatus).map(([itemId, status]) => {
@@ -182,15 +249,15 @@ const EntryShow = ({urlID, refresh, onRefresh, hasPermissions = false}) => {
                 <thead>
                     <tr>
                         <th colSpan="1" className="action-buttons-cell">
-                            <EntryDelete 
-                                items={selectedItems} 
+                            <EntryDelete
+                                items={selectedItems}
                                 onEntryDeleted={() => {
                                     setSelectedItems([]);
                                     onRefresh();
                                 }}
                             />
                         </th>
-                        <th colSpan="1">
+                        <th colSpan="1" className="col-name">
                             <input
                                 type="text"
                                 placeholder="Search by name..."
@@ -205,15 +272,15 @@ const EntryShow = ({urlID, refresh, onRefresh, hasPermissions = false}) => {
                                 value={searchType}
                                 onChange={(e) => setSearchType(e.target.value)}
                             />
-                        </th> 
-                        <th colSpan="1">
+                        </th>
+                        <th colSpan="1" className="col-location">
                             <input
                                 type="text"
                                 placeholder="Search by location..."
                                 value={searchLocation}
                                 onChange={(e) => setSearchLocation(e.target.value)}
                             />
-                        </th> 
+                        </th>
                         <th colSpan="1">
                             <input
                                 type="date"
@@ -263,9 +330,9 @@ const EntryShow = ({urlID, refresh, onRefresh, hasPermissions = false}) => {
                                 <label htmlFor="select-all-checkbox">All</label>
                             </div>
                         </th>
-                        <th>Name</th>
+                        <th className="col-name">Name</th>
                         <th>Type</th>
-                        <th>Location</th>
+                        <th className="col-location">Location</th>
                         <th>Date</th>
                         <th>Notes</th>
                         <th>Contributor</th>
@@ -273,6 +340,73 @@ const EntryShow = ({urlID, refresh, onRefresh, hasPermissions = false}) => {
                     </tr>
                 </thead>
                 <tbody>
+                    <tr className="new-entry-row">
+                        <td className="checkbox-cell" data-label=""></td>
+                        <td className="col-name" data-label="Name">
+                            <textarea
+                                className={`table-edit-fields${nameError ? ' new-entry-name-error' : ''}`}
+                                placeholder="Add entry name…"
+                                value={newEntry.name}
+                                rows="1"
+                                onInput={handleResize}
+                                onChange={(e) => { setNameError(false); setNewEntry(p => ({ ...p, name: e.target.value })); }}
+                            />
+                        </td>
+                        <td data-label="Type">
+                            <select
+                                className="table-edit-fields"
+                                value={newEntry.type}
+                                onChange={(e) => setNewEntry(p => ({ ...p, type: e.target.value }))}
+                            >
+                                <option value="">Type</option>
+                                <option value="Food & Drink">Food &amp; Drink</option>
+                                <option value="Shopping">Shopping</option>
+                                <option value="Activity">Activity</option>
+                                <option value="Sightseeing">Sightseeing</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </td>
+                        <td className="col-location" data-label="Location">
+                            <textarea
+                                className="table-edit-fields"
+                                placeholder="Location"
+                                value={newEntry.location}
+                                rows="1"
+                                onInput={handleResize}
+                                onChange={(e) => setNewEntry(p => ({ ...p, location: e.target.value }))}
+                            />
+                        </td>
+                        <td data-label="Date">
+                            <input
+                                className="table-edit-fields"
+                                type="date"
+                                value={newEntry.date}
+                                onChange={(e) => setNewEntry(p => ({ ...p, date: e.target.value }))}
+                            />
+                        </td>
+                        <td data-label="Notes">
+                            <textarea
+                                className="table-edit-fields"
+                                placeholder="Notes"
+                                value={newEntry.notes}
+                                rows="1"
+                                onInput={handleResize}
+                                onChange={(e) => setNewEntry(p => ({ ...p, notes: e.target.value }))}
+                            />
+                        </td>
+                        <td data-label="Contributor">{user?.username}</td>
+                        <td className="actions-cell new-entry-actions" data-label="Actions">
+                            <button
+                                type="button"
+                                className="add-entry-btn"
+                                onClick={handleCreate}
+                                disabled={creating}
+                                title="Add entry (or press Enter)"
+                            >
+                                {creating ? '…' : '+'}
+                            </button>
+                        </td>
+                    </tr>
                     {filteredData.map((item)=> (
                         <tr key={item.id}>
                             <td className="checkbox-cell" data-label="">
@@ -282,15 +416,14 @@ const EntryShow = ({urlID, refresh, onRefresh, hasPermissions = false}) => {
                                     onChange={() => handleCheckboxChange(item)}
                                 />
                             </td>
-                            <td data-label="Name">
+                            <td className="col-name" data-label="Name">
                                 <div className="cell-wrapper">
-                                    <input
+                                    <textarea
                                         className="table-edit-fields"
-                                        type="text"
                                         value={item.name}
-                                        onChange={(e) => {
-                                            handleChange(item.id, "name", e.target.value)
-                                        }}
+                                        rows="1"
+                                        onInput={handleResize}
+                                        onChange={(e) => handleChange(item.id, "name", e.target.value)}
                                     />
                                     {savingStatus[item.id] && (
                                         <span className={`cell-status cell-${savingStatus[item.id]}`} title={
@@ -318,14 +451,13 @@ const EntryShow = ({urlID, refresh, onRefresh, hasPermissions = false}) => {
                                     <option value="Other">Other</option>
                                 </select>
                             </td>
-                            <td data-label="Location">
-                                <input
+                            <td className="col-location" data-label="Location">
+                                <textarea
                                     className="table-edit-fields"
-                                    type="text"
                                     value={item.location ?? ""}
-                                    onChange={(e) => {
-                                        handleChange(item.id, "location", e.target.value)
-                                    }}
+                                    rows="1"
+                                    onInput={handleResize}
+                                    onChange={(e) => handleChange(item.id, "location", e.target.value)}
                                 />
                             </td>
                             <td data-label="Date">
@@ -341,11 +473,10 @@ const EntryShow = ({urlID, refresh, onRefresh, hasPermissions = false}) => {
                             <td data-label="Notes">
                                 <textarea
                                     className="table-edit-fields"
-                                    type="text"
                                     value={item.notes ?? ""}
-                                    onChange={(e) => {
-                                        handleChange(item.id, "notes", e.target.value)
-                                    }}
+                                    rows="1"
+                                    onInput={handleResize}
+                                    onChange={(e) => handleChange(item.id, "notes", e.target.value)}
                                 />
                             </td>
                             <td data-label="Contributor">{item.contributor}</td>
@@ -448,9 +579,9 @@ const EntryShow = ({urlID, refresh, onRefresh, hasPermissions = false}) => {
                         </th>
                     </tr>
                     <tr>
-                        <th>Name</th>
+                        <th className="col-name">Name</th>
                         <th>Type</th>
-                        <th>Location</th>
+                        <th className="col-location">Location</th>
                         <th>Date</th>
                         <th>Notes</th>
                         <th>Contributor</th>
@@ -459,9 +590,9 @@ const EntryShow = ({urlID, refresh, onRefresh, hasPermissions = false}) => {
                 <tbody>
                     {filteredData.map((item)=> (
                         <tr key={item.id}>
-                            <td data-label="Name">{item.name}</td>
+                            <td className="col-name" data-label="Name">{item.name}</td>
                             <td data-label="Type">{item.type}</td>
-                            <td data-label="Location">{item.location}</td>
+                            <td className="col-location" data-label="Location">{item.location}</td>
                             <td data-label="Date">{item.date}</td>
                             <td data-label="Notes">{item.notes}</td>
                             <td data-label="Contributor">{item.contributor}</td>

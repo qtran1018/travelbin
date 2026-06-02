@@ -9,12 +9,15 @@ from django.contrib.auth import get_user_model
 User = get_user_model()
 
 KEYCLOAK_ISSUER = getattr(settings, "KEYCLOAK_ISSUER", "http://localhost:8180/realms/travel-platform")
+# KEYCLOAK_JWKS_URL lets Docker deployments fetch keys via the internal network
+# (e.g. http://keycloak:8080/...) while still validating iss against the public URL.
+KEYCLOAK_JWKS_URL = getattr(settings, "KEYCLOAK_JWKS_URL", None)
 KEYCLOAK_AUDIENCE = getattr(settings, "KEYCLOAK_AUDIENCE", None)
 
 
 @lru_cache(maxsize=1)
 def _get_jwks_client():
-    jwks_uri = f"{KEYCLOAK_ISSUER}/protocol/openid-connect/certs"
+    jwks_uri = KEYCLOAK_JWKS_URL or f"{KEYCLOAK_ISSUER}/protocol/openid-connect/certs"
     return jwt.PyJWKClient(jwks_uri, cache_keys=True)
 
 

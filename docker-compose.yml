@@ -4,6 +4,7 @@ services:
   travelbin-db:
     image: postgres:16
     container_name: travelbin-postgres
+    profiles: ["standalone"]
     environment:
       POSTGRES_DB: travelbin
       POSTGRES_USER: travelbin
@@ -20,21 +21,26 @@ services:
     restart: unless-stopped
     networks:
       - travelplatform-network
-    
+
   travelbin-backend:
     build: ./travelbin-backend
     container_name: travelbin-backend
     depends_on:
       travelbin-db:
         condition: service_healthy
+        required: false
     ports:
       - "8000:8000"
     environment:
       POSTGRES_DB: travelbin
       POSTGRES_USER: travelbin
       POSTGRES_PASSWORD: travelbin
-      POSTGRES_HOST: travelbin-db
-      POSTGRES_PORT: 5432
+      DB_HOST: ${POSTGRES_HOST:-travelbin-db}
+      DB_PORT: 5432
+      # Tokens are issued via localhost:8180 (browser flow), so iss claim uses that public URL.
+      # JWKS is fetched via keycloak container name so the backend can reach it inside Docker.
+      KEYCLOAK_ISSUER: http://localhost:8180/realms/travel-platform
+      KEYCLOAK_JWKS_URL: http://keycloak:8080/realms/travel-platform/protocol/openid-connect/certs
     healthcheck:
       test: ["CMD-SHELL", "python manage.py check || exit 1"]
       interval: 30s
@@ -51,12 +57,7 @@ services:
     depends_on:
       - travelbin-backend
     ports:
-      - "3000:5173"
-    environment:
-      - CHOKIDAR_USEPOLLING=true
-    volumes:
-      - ./travelbin-frontend:/app
-      - /app/node_modules
+      - "3001:3001"
     restart: unless-stopped
     networks:
       - travelplatform-network

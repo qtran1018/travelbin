@@ -1,3 +1,5 @@
+import logging
+
 from Traveler.User.serializer import UserSerializer
 from Traveler.User.models import User
 from rest_framework.decorators import api_view, permission_classes
@@ -8,6 +10,8 @@ from Traveler.Destination.models import TravelDestination
 from Traveler.Permission.models import Permissions
 from Traveler.Destination.serializer import TravelDestinationSerializer
 from Traveler.Permission.serializer import PermissionSerializer
+
+logger = logging.getLogger("Traveler")
 
 def create_permissions(user_id, destination_id):
     destination_permissions = Permissions(user=user_id, destination_id=destination_id)
@@ -58,18 +62,32 @@ def get_permissions_by_user(request,user_id):
 def get_permissions_by_destination(request, destination_id):
     perms = Permissions.objects.filter(destination_id=destination_id)
     if not perms.exists():
-        return Response(f'No permissions exist for destination {destination_id}', status=status.HTTP_404_NOT_FOUND)
-    serializer = PermissionSerializer(perms,many=True)
-    return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response([], status=status.HTTP_200_OK)
+    result = []
+    for perm in perms:
+        try:
+            user = User.objects.get(id=perm.user)
+            result.append({
+                'permission_id': perm.id,
+                'user_id': perm.user,
+                'username': user.username,
+                'email': user.email,
+            })
+        except User.DoesNotExist:
+            logger.warning("Permission %s references missing user id=%s", perm.id, perm.user)
+    return Response(result, status=status.HTTP_200_OK)
 
 @api_view(['DELETE', 'GET'])
 @permission_classes([IsAuthenticated])
 def remove_permissions(request, destination_id, delete_email):
 
     if not has_perms(request.user.id, destination_id):
-        return Response(f'{request.user.email} does not have permission to delete this.',status=status.HTTP_401_UNAUTHORIZED)
+        return Response(f'{request.user.email} does not have permission to delete this.', status=status.HTTP_403_FORBIDDEN)
     delete_email = (delete_email or "").strip().lower()
-    delete_email_id = User.objects.filter(email=delete_email)[0].id
+    target_user = User.objects.filter(email=delete_email).first()
+    if target_user is None:
+        return Response(f'No user with email {delete_email} exists', status=status.HTTP_404_NOT_FOUND)
+    delete_email_id = target_user.id
     destination = TravelDestination.objects.filter(id=destination_id)
     if not destination.exists():
         return Response(f'No destination exists for id {destination_id}', status=status.HTTP_404_NOT_FOUND)
