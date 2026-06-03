@@ -39,6 +39,7 @@ services:
       DB_PORT: 5432
       SECRET_KEY: ${DJANGO_SECRET_KEY:-django-insecure-*ba^c%!mo3-k#_ev#9va4sgm2=uj4)-k793ddaiisiswougjcn}
       DEBUG: "False"
+      ALLOWED_HOSTS: localhost,127.0.0.1,travelbin-backend,0.0.0.0,travelbin-api.quangntran.com
       KEYCLOAK_ISSUER: https://auth.quangntran.com/realms/travel-platform
       CORS_ALLOWED_ORIGINS: https://travelbin.quangntran.com
     healthcheck:
