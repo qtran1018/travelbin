@@ -37,7 +37,10 @@ services:
       POSTGRES_PASSWORD: travelbin
       DB_HOST: ${POSTGRES_HOST:-travelbin-db}
       DB_PORT: 5432
+      SECRET_KEY: ${DJANGO_SECRET_KEY:-django-insecure-*ba^c%!mo3-k#_ev#9va4sgm2=uj4)-k793ddaiisiswougjcn}
+      DEBUG: "False"
       KEYCLOAK_ISSUER: https://auth.quangntran.com/realms/travel-platform
+      CORS_ALLOWED_ORIGINS: https://travelbin.quangntran.com
     healthcheck:
       test: ["CMD-SHELL", "python manage.py check || exit 1"]
       interval: 30s

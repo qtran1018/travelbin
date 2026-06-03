@@ -21,10 +21,10 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-*ba^c%!mo3-k#_ev#9va4sgm2=uj4)-k793ddaiisiswougjcn'
+SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-*ba^c%!mo3-k#_ev#9va4sgm2=uj4)-k793ddaiisiswougjcn')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.getenv('DEBUG', 'False') == 'True'
 
 ALLOWED_HOSTS = os.environ.get(
     'ALLOWED_HOSTS',
@@ -109,11 +109,7 @@ KEYCLOAK_ISSUER = os.getenv('KEYCLOAK_ISSUER', 'http://localhost:8180/realms/tra
 KEYCLOAK_JWKS_URL = os.getenv('KEYCLOAK_JWKS_URL') or None
 
 #CORS_ALLOW_ALL_ORIGINS = True
-CORS_ALLOWED_ORIGINS = [
-    "http://localhost:3000",
-    "http://localhost:3001",
-    "http://localhost:5173",
-]
+CORS_ALLOWED_ORIGINS = os.getenv('CORS_ALLOWED_ORIGINS', 'http://localhost:3000,http://localhost:3001,http://localhost:5173').split(',')
 CORS_ALLOW_CREDENTIALS = False
 CORS_ALLOW_METHODS = [
     'GET',
