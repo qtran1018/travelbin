@@ -37,10 +37,7 @@ services:
       POSTGRES_PASSWORD: travelbin
       DB_HOST: ${POSTGRES_HOST:-travelbin-db}
       DB_PORT: 5432
-      # Tokens are issued via localhost:8180 (browser flow), so iss claim uses that public URL.
-      # JWKS is fetched via keycloak container name so the backend can reach it inside Docker.
-      KEYCLOAK_ISSUER: http://localhost:8180/realms/travel-platform
-      KEYCLOAK_JWKS_URL: http://keycloak:8080/realms/travel-platform/protocol/openid-connect/certs
+      KEYCLOAK_ISSUER: https://auth.quangntran.com/realms/travel-platform
     healthcheck:
       test: ["CMD-SHELL", "python manage.py check || exit 1"]
       interval: 30s
