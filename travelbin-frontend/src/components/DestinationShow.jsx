@@ -26,7 +26,7 @@ const DestinationShow = ({ refresh, onRefresh, canCreate = false }) => {
 
     useEffect(() => {
         apiClient.get(`/travel/u/${id}/`)
-            .then(res => setData(res.data))
+            .then(res => setData(Array.isArray(res.data) ? res.data : []))
             .catch(err => console.error("Error fetching destinations:", err));
     }, [id, refresh]);
 

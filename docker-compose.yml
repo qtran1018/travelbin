@@ -58,6 +58,8 @@ services:
       - travelbin-backend
     ports:
       - "3001:3001"
+    environment:
+      VITE_API_URL: https://travelbin-api.quangntran.com
     restart: unless-stopped
     networks:
       - travelplatform-network
