@@ -35,7 +35,7 @@ services:
       POSTGRES_DB: travelbin
       POSTGRES_USER: travelbin
       POSTGRES_PASSWORD: travelbin
-      DB_HOST: ${POSTGRES_HOST:-travelbin-db}
+      DB_HOST: ${POSTGRES_HOST:-platform-postgres}
       DB_PORT: 5432
       SECRET_KEY: ${DJANGO_SECRET_KEY:-django-insecure-*ba^c%!mo3-k#_ev#9va4sgm2=uj4)-k793ddaiisiswougjcn}
       DEBUG: "False"
