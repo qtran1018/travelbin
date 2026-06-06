@@ -119,6 +119,7 @@ def import_destination(request):
             type=entry_type,
             location=e.get('location', '')[:100],
             notes=e.get('notes', ''),
+            date=e.get('date') or None,
             contributor=request.user,
         )
 
