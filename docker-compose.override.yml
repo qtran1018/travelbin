@@ -1,0 +1,14 @@
+# LOCAL DEV ONLY — automatically applied by `docker compose up`.
+# Production deploy uses: docker compose -f docker-compose.yml up
+
+services:
+  travelbin-backend:
+    environment:
+      KEYCLOAK_ISSUER: http://localhost:8180/realms/travel-platform
+      CORS_ALLOWED_ORIGINS: http://localhost:3001,http://localhost:3010,http://localhost:3000,http://localhost:5173
+
+  travelbin-frontend:
+    build:
+      args:
+        VITE_API_URL: http://localhost:8000
+        VITE_KEYCLOAK_URL: http://localhost:8180

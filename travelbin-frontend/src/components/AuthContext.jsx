@@ -54,7 +54,7 @@ export const AuthProvider = ({ children }) => {
     const register = (redirectUri = window.location.origin) => keycloak.register({ redirectUri });
 
     const logout = () =>
-        keycloak.logout({ redirectUri: window.location.origin });
+        keycloak.logout({ redirectUri: window.location.href });
 
     return (
         <AuthContext.Provider value={{ user, authLoading, login, register, logout, keycloak }}>

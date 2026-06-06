@@ -8,5 +8,9 @@ export default defineConfig({
     port: 3001,
     host: '0.0.0.0',
     allowedHosts: true,
+    watch: {
+      usePolling: true,
+      interval: 300,
+    },
   },
 })

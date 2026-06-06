@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef, useCallback } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { useParams, Link } from "react-router-dom";
 import { apiClient } from "../config/api";
 import '../styles/Profile.css';
@@ -6,10 +6,7 @@ import '../styles/Profile.css';
 const DestinationShow = ({ refresh, onRefresh, canCreate = false }) => {
     const { id } = useParams();
     const [data, setData] = useState([]);
-    const [searchName, setSearchName] = useState("");
-
     // Create state
-    const [isCreating, setIsCreating] = useState(false);
     const [newName, setNewName] = useState("");
     const [creating, setCreating] = useState(false);
     const createInputRef = useRef(null);
@@ -30,18 +27,6 @@ const DestinationShow = ({ refresh, onRefresh, canCreate = false }) => {
             .catch(err => console.error("Error fetching destinations:", err));
     }, [id, refresh]);
 
-    // Auto-focus create input when form opens
-    useEffect(() => {
-        if (isCreating && createInputRef.current) {
-            createInputRef.current.focus();
-        }
-    }, [isCreating]);
-
-    const filteredData = data.filter(item => {
-        const q = searchName.toLowerCase();
-        return !q || item.name?.toLowerCase().includes(q) || item.id?.toString().includes(q);
-    });
-
     const handleCreate = async (e) => {
         e.preventDefault();
         if (!newName.trim()) return;
@@ -49,7 +34,6 @@ const DestinationShow = ({ refresh, onRefresh, canCreate = false }) => {
         try {
             await apiClient.post('/travel/d/add_travel/', { name: newName.trim() });
             setNewName("");
-            setIsCreating(false);
             onRefresh();
         } catch (err) {
             console.error("Error creating destination:", err);
@@ -57,11 +41,6 @@ const DestinationShow = ({ refresh, onRefresh, canCreate = false }) => {
         } finally {
             setCreating(false);
         }
-    };
-
-    const cancelCreate = () => {
-        setIsCreating(false);
-        setNewName("");
     };
 
     // Auto-focus rename input when it opens
@@ -130,64 +109,38 @@ const DestinationShow = ({ refresh, onRefresh, canCreate = false }) => {
                         <span className="destinations-count">{data.length}</span>
                     )}
                 </div>
-                <div className="destinations-header-right">
-                    <input
-                        type="text"
-                        className="destinations-search"
-                        placeholder="Search…"
-                        value={searchName}
-                        onChange={e => setSearchName(e.target.value)}
-                    />
-                    {canCreate && !isCreating && (
-                        <button className="dest-new-btn" onClick={() => setIsCreating(true)}>
-                            + New
-                        </button>
-                    )}
-                </div>
-            </div>
-
-            {/* Inline create form */}
-            {canCreate && isCreating && (
-                <form className="dest-create-form" onSubmit={handleCreate}>
-                    <input
-                        ref={createInputRef}
-                        type="text"
-                        className="dest-create-input"
-                        placeholder="Destination name…"
-                        value={newName}
-                        onChange={e => setNewName(e.target.value)}
-                    />
-                    <div className="dest-create-actions">
+                {canCreate && (
+                    <form className="destinations-header-right" onSubmit={handleCreate}>
+                        <input
+                            ref={createInputRef}
+                            type="text"
+                            className="destinations-search"
+                            placeholder="New destination…"
+                            value={newName}
+                            onChange={e => setNewName(e.target.value)}
+                            maxLength={100}
+                        />
                         <button
                             type="submit"
-                            className="dest-create-save"
+                            className="dest-new-btn"
                             disabled={creating || !newName.trim()}
                         >
-                            {creating ? "Saving…" : "Save"}
+                            {creating ? "…" : "+ New"}
                         </button>
-                        <button
-                            type="button"
-                            className="dest-create-cancel"
-                            onClick={cancelCreate}
-                        >
-                            Cancel
-                        </button>
-                    </div>
-                </form>
-            )}
+                    </form>
+                )}
+            </div>
 
             {/* List */}
             <div className="destinations-list">
-                {filteredData.length === 0 ? (
+                {data.length === 0 ? (
                     <div className="destinations-empty">
-                        {searchName
-                            ? "No destinations match your search."
-                            : canCreate
-                                ? 'No destinations yet. Hit "+ New" to add one.'
-                                : "No destinations yet."}
+                        {canCreate
+                            ? "No destinations yet. Type a name above and hit + New."
+                            : "No destinations yet."}
                     </div>
                 ) : (
-                    filteredData.map(item => (
+                    data.map(item => (
                         <div key={item.id} className="destination-row">
                             {editingId === item.id ? (
                                 <div className="dest-rename-form">

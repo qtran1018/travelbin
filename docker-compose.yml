@@ -8,7 +8,7 @@ services:
     environment:
       POSTGRES_DB: travelbin
       POSTGRES_USER: travelbin
-      POSTGRES_PASSWORD: travelbin
+      POSTGRES_PASSWORD: ${TRAVELBIN_DB_PASSWORD:-travelbin}
     ports:
       - "5433:5432"
     volumes:
@@ -34,7 +34,7 @@ services:
     environment:
       POSTGRES_DB: travelbin
       POSTGRES_USER: travelbin
-      POSTGRES_PASSWORD: travelbin
+      POSTGRES_PASSWORD: ${TRAVELBIN_DB_PASSWORD:-travelbin}
       DB_HOST: ${POSTGRES_HOST:-platform-postgres}
       DB_PORT: 5432
       SECRET_KEY: ${DJANGO_SECRET_KEY:-django-insecure-*ba^c%!mo3-k#_ev#9va4sgm2=uj4)-k793ddaiisiswougjcn}
@@ -54,14 +54,16 @@ services:
       - travelplatform-network
 
   travelbin-frontend:
-    build: ./travelbin-frontend
+    build:
+      context: ./travelbin-frontend
+      args:
+        VITE_API_URL: https://travelbin-api.quangntran.com
+        VITE_KEYCLOAK_URL: https://auth.quangntran.com
     container_name: travelbin-frontend
     depends_on:
       - travelbin-backend
     ports:
       - "3001:3001"
-    environment:
-      VITE_API_URL: https://travelbin-api.quangntran.com
     restart: unless-stopped
     networks:
       - travelplatform-network

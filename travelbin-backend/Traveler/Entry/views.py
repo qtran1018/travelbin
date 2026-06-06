@@ -4,6 +4,7 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
+from django.db import transaction
 from django.db.models.functions import Coalesce
 from django.db.models import Value
 from datetime import date
@@ -54,9 +55,36 @@ def get_travel_entry_by_pk(request, pk):
 def get_travel_entry_by_destination(request, destination_id):
     entry = TravelEntry.objects.filter(destination=destination_id).annotate(
         sort_date=Coalesce('date', Value(date(9999, 12, 31)))
-    ).order_by('sort_date')
+    ).order_by('sort_date', 'sort_order')
     serializer = TravelEntrySerializer(entry, many=True)
     return Response(serializer.data)
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def reorder_entries(request, destination_id):
+    items = request.data
+    if not isinstance(items, list):
+        return Response({'message': 'Expected a list of {id, sort_order} objects.'}, status=status.HTTP_400_BAD_REQUEST)
+
+    user_id = request.user.id
+    if not permission.has_perms(user_id, destination_id):
+        return Response({'message': 'You do not have permission to reorder entries.'}, status=status.HTTP_403_FORBIDDEN)
+
+    ids = [item.get('id') for item in items if item.get('id') is not None]
+    entries = {e.id: e for e in TravelEntry.objects.filter(id__in=ids, destination=destination_id)}
+
+    to_update = []
+    for item in items:
+        entry = entries.get(item.get('id'))
+        if entry is not None:
+            entry.sort_order = item.get('sort_order', 0)
+            to_update.append(entry)
+
+    with transaction.atomic():
+        TravelEntry.objects.bulk_update(to_update, ['sort_order'])
+
+    return Response({'updated': len(to_update)}, status=status.HTTP_200_OK)
 
 
 @api_view(['PATCH'])

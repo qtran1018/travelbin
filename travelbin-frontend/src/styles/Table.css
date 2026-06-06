@@ -60,7 +60,7 @@ body {
     color: white;
 }
 
-/* Modern table styling */
+/* Table */
 table {
     border-collapse: separate;
     border-spacing: 0;
@@ -68,22 +68,17 @@ table {
     max-width: 100%;
     margin: 0 auto 2rem;
     background-color: var(--card-bg);
-    border-radius: 12px;
+    border-radius: 10px;
     overflow: hidden;
-    box-shadow: var(--shadow-md);
-    transition: box-shadow 0.3s ease;
-}
-
-[data-theme="dark"] table {
-    box-shadow: var(--shadow-lg);
+    border: 1px solid var(--border-color);
 }
 
 th, td {
-    border-right: 1px solid var(--border-color);
+    border-right: none;
     border-bottom: 1px solid var(--border-color);
-    padding: 12px 16px;
+    padding: 10px 14px;
     text-align: left;
-    transition: all 0.2s ease;
+    transition: background 0.15s ease;
     position: relative;
 }
 
@@ -94,8 +89,8 @@ th:last-child, td:last-child {
 th {
     background: var(--secondary-color);
     font-weight: 600;
-    font-size: 0.8125rem;
-    letter-spacing: 0.3px;
+    font-size: 0.75rem;
+    letter-spacing: 0.5px;
     color: var(--text-color);
     text-transform: uppercase;
     position: sticky;
@@ -104,15 +99,22 @@ th {
     user-select: none;
 }
 
+/* Column label row — stronger bottom line to separate from data */
+thead tr:last-child th {
+    border-bottom: 2px solid var(--border-color);
+}
+
+/* Filter inputs in header — minimal, borderless */
 th input {
     width: 100%;
-    padding: 8px 12px;
-    border: 1px solid var(--border-color);
-    border-radius: 6px;
-    background-color: var(--card-bg);
+    padding: 4px 0;
+    border: none;
+    border-bottom: 1px solid transparent;
+    border-radius: 0;
+    background: transparent;
     color: var(--text-color);
-    font-size: 0.875rem;
-    transition: all 0.2s ease;
+    font-size: 0.8rem;
+    transition: border-color 0.15s ease;
     font-weight: normal;
     text-transform: none;
     letter-spacing: normal;
@@ -120,13 +122,13 @@ th input {
 
 th input:focus {
     outline: none;
-    border-color: var(--primary-color);
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    border-bottom-color: var(--border-hover);
+    box-shadow: none;
 }
 
 th input::placeholder {
     color: var(--text-color);
-    opacity: 0.5;
+    opacity: 0.4;
 }
 
 /* Action buttons in table header cell */
@@ -184,15 +186,11 @@ tr:last-child td {
 }
 
 tbody tr {
-    transition: all 0.15s ease;
+    transition: background 0.12s ease;
 }
 
-tbody tr:hover {
+tbody tr:not(.new-entry-row):hover {
     background-color: var(--secondary-color);
-}
-
-tbody tr:hover td {
-    background-color: transparent;
 }
 
 /* Cell wrapper for editable cells */
@@ -344,9 +342,11 @@ td input[type="checkbox"]:hover {
     transform: scale(1.1);
 }
 
-/* Center checkbox column in entries table */
-.entry-page table th:first-child,
-.entry-page table td:first-child {
+/* Center checkbox and drag-handle columns in entries table */
+.entry-page table .checkbox-header,
+.entry-page table .checkbox-cell,
+.entry-page table .drag-handle-header,
+.entry-page table .drag-handle-cell {
     text-align: center;
 }
 
@@ -633,6 +633,82 @@ td a:hover {
     animation: fadeIn 0.3s ease;
 }
 
+.entry-page h1 {
+    text-align: left;
+    font-size: 1.5rem;
+    font-weight: 600;
+    letter-spacing: -0.2px;
+    margin-bottom: 1.25rem;
+}
+
+/* Toolbar above the entry table */
+.entry-toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 0.875rem;
+}
+
+.entry-toolbar-left {
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+    flex-wrap: wrap;
+}
+
+/* Toolbar action buttons — clean, no shadow, no lift */
+.entry-action-btn {
+    margin: 0;
+    padding: 0.375rem 0.75rem;
+    font-size: 0.8125rem;
+    font-weight: 500;
+    border-radius: 6px;
+    border: 1px solid var(--border-color);
+    background: var(--card-bg);
+    color: var(--text-color);
+    cursor: pointer;
+    transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+    box-shadow: none;
+    letter-spacing: 0.01em;
+    white-space: nowrap;
+}
+
+.entry-action-btn:hover:not(:disabled) {
+    background: var(--secondary-color);
+    border-color: var(--border-hover);
+    transform: none;
+    box-shadow: none;
+}
+
+/* Ghost variant — for Reset filters (low-priority action) */
+.entry-action-btn--ghost {
+    border-color: transparent;
+    background: transparent;
+    color: var(--text-color);
+    opacity: 0.55;
+}
+
+.entry-action-btn--ghost:hover:not(:disabled) {
+    background: var(--secondary-color);
+    border-color: transparent;
+    opacity: 1;
+    box-shadow: none;
+    transform: none;
+}
+
+/* Copied state for invite link button */
+.entry-action-btn--copied {
+    border-color: var(--success-color);
+    color: var(--success-color);
+}
+
+.entry-action-btn--copied:hover:not(:disabled) {
+    background: color-mix(in srgb, var(--success-color) 8%, transparent);
+    border-color: var(--success-color);
+}
+
 /* Responsive design */
 @media (max-width: 768px) {
     /* Card-style tables for mobile */
@@ -820,16 +896,11 @@ td a:hover {
 /* Inline new-entry row */
 .new-entry-row td {
     background-color: var(--secondary-color);
-    border-left: 3px solid var(--primary-color);
-    border-bottom: none;
-}
-
-.new-entry-row td:first-child {
-    border-left: 3px solid var(--primary-color);
+    border-bottom: 2px solid var(--border-color);
 }
 
 .new-entry-row .table-edit-fields::placeholder {
-    opacity: 0.55;
+    opacity: 0.45;
     font-style: italic;
 }
 
@@ -846,41 +917,188 @@ td a:hover {
 }
 
 .add-entry-btn {
-    width: 32px;
-    height: 32px;
+    width: 28px;
+    height: 28px;
     border-radius: 50%;
-    border: 2px solid var(--primary-color);
-    background: none;
-    color: var(--primary-color);
-    font-size: 1.25rem;
+    border: 1.5px solid var(--border-color);
+    background: var(--card-bg);
+    color: var(--text-color);
+    font-size: 1.1rem;
     line-height: 1;
     cursor: pointer;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    transition: all 0.2s ease;
+    transition: background 0.15s ease, border-color 0.15s ease, opacity 0.15s ease;
     padding: 0;
     flex-shrink: 0;
+    opacity: 0.55;
+    margin: 0;
+    box-shadow: none;
 }
 
 .add-entry-btn:hover:not(:disabled) {
-    background-color: var(--primary-color);
-    color: white;
-    transform: scale(1.1);
+    background: var(--border-color);
+    border-color: var(--border-hover);
+    color: var(--text-color);
+    opacity: 1;
+    transform: none;
+    box-shadow: none;
 }
 
 .add-entry-btn:disabled {
-    opacity: 0.4;
+    opacity: 0.25;
     cursor: not-allowed;
-}
-
-/* Smooth scrolling */
-table {
-    scroll-behavior: smooth;
 }
 
 /* Focus visible for accessibility */
 .table-edit-fields:focus-visible {
     outline: 2px solid var(--primary-color);
     outline-offset: 2px;
+}
+
+/* ---- Filter bar (replaces filter thead row) ---- */
+.entry-filter-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.entry-filter-bar input {
+    flex: 1 1 120px;
+    min-width: 100px;
+    padding: 0.375rem 0.625rem;
+    font-size: 0.8rem;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    background: var(--card-bg);
+    color: var(--text-color);
+    transition: border-color 0.15s ease;
+}
+
+.entry-filter-bar input:focus {
+    outline: none;
+    border-color: var(--border-hover);
+}
+
+.entry-filter-bar input::placeholder {
+    color: var(--text-color);
+    opacity: 0.4;
+}
+
+.filter-bar-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-shrink: 0;
+}
+
+.filter-bar-select-all {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    font-size: 0.8rem;
+    color: var(--text-color);
+    opacity: 0.7;
+    cursor: pointer;
+    user-select: none;
+}
+
+.filter-bar-select-all input[type="checkbox"] {
+    width: 15px;
+    height: 15px;
+    accent-color: var(--primary-color);
+}
+
+/* ---- Day group sections ---- */
+.day-group {
+    margin-bottom: 2rem;
+}
+
+.day-group-header {
+    display: flex;
+    align-items: center;
+    gap: 0.625rem;
+    margin-bottom: 0.5rem;
+    padding: 0 2px;
+}
+
+.day-group-label {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--text-color);
+    letter-spacing: -0.01em;
+}
+
+.day-group-count {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 20px;
+    height: 20px;
+    padding: 0 6px;
+    border-radius: 10px;
+    background: var(--secondary-color);
+    color: var(--text-color);
+    font-size: 0.7rem;
+    font-weight: 600;
+    opacity: 0.7;
+}
+
+/* Empty state */
+.entries-empty {
+    padding: 2rem;
+    text-align: center;
+    color: var(--text-color);
+    opacity: 0.5;
+    font-size: 0.9rem;
+}
+
+/* New-entry table sits above day groups — match entry-table style but no bottom margin */
+.new-entry-table {
+    margin-bottom: 1rem;
+}
+
+/* ---- Drag handle column ---- */
+.drag-handle-header,
+.drag-handle-cell {
+    width: 28px;
+    min-width: 28px;
+    max-width: 28px;
+    padding: 0 4px;
+    text-align: center;
+    color: var(--text-color);
+    opacity: 0.3;
+    font-size: 1rem;
+    cursor: grab;
+    user-select: none;
+}
+
+.drag-handle-cell:active {
+    cursor: grabbing;
+}
+
+/* ---- DnD row states ---- */
+.entry-row--dragging {
+    opacity: 0.45;
+}
+
+.entry-row--drag-over {
+    background-color: var(--secondary-color);
+    outline: 2px solid var(--border-hover);
+    outline-offset: -2px;
+}
+
+@media (max-width: 768px) {
+    /* Collapse filter bar on mobile */
+    .entry-filter-bar {
+        display: none;
+    }
+
+    /* Hide drag handle on mobile cards */
+    .responsive-table tbody td.drag-handle-cell {
+        display: none;
+    }
 }

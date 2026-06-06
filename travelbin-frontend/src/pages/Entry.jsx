@@ -79,8 +79,8 @@ const Entry = () => {
 
     const ownerControls = user && hasPermissions ? (
         <>
-            <button className="btn-secondary" onClick={() => setModalOpen(true)}>Members</button>
-            <button className="btn-secondary" onClick={handleCopyInviteLink}>{copyLabel}</button>
+            <button className="entry-action-btn" onClick={() => setModalOpen(true)}>Members</button>
+            <button className={`entry-action-btn${copyLabel !== "Copy Invite Link" ? " entry-action-btn--copied" : ""}`} onClick={handleCopyInviteLink}>{copyLabel}</button>
             <MembersModal
                 isOpen={modalOpen}
                 onClose={handleModalClose}

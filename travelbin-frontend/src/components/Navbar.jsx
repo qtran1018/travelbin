@@ -63,6 +63,26 @@ export function Navbar() {
                     </button>
 
                     <div ref={menuRef} className={`navbar-actions ${isMenuOpen ? 'open' : ''}`}>
+                        <a
+                            href="https://splitpush.quangntran.com"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="navbar-link navbar-link--external"
+                            onClick={closeMenu}
+                        >
+                            Splitpush ↗
+                        </a>
+                        <a
+                            href="https://agent.quangntran.com"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="navbar-link navbar-link--external"
+                            onClick={closeMenu}
+                        >
+                            Itinerary ↗
+                        </a>
+                        <span className="navbar-divider" aria-hidden="true"></span>
+
                         {user && (
                             <NavLink
                                 to={`/u/${user.username}`}

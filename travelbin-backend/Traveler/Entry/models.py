@@ -19,6 +19,7 @@ class TravelEntry(models.Model):
     #maybe add address eventually
     date = models.DateField(blank=True, null=True)
     notes = models.TextField(blank=True)
+    sort_order = models.IntegerField(default=0)
 
     # this is the user who added the entry. Use either username or a nickname of available
     contributor = models.ForeignKey(User, on_delete=models.SET_NULL, to_field='username', null=True, db_constraint=False)
