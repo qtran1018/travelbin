@@ -53,7 +53,6 @@ const EntryRow = ({
             getData: () => ({ type: 'entry', id: item.id, dateKey }),
             canDrop: ({ source }) =>
                 source.data.type === 'entry' &&
-                source.data.dateKey === dateKey &&
                 source.data.id !== item.id,
             onDragEnter: () => setIsDragOver(true),
             onDragLeave: () => setIsDragOver(false),
@@ -209,7 +208,7 @@ const EntryShow = ({ urlID, refresh, onRefresh, hasPermissions = false, extraCon
         setSearchDate(""); setSearchNotes(""); setSearchContributor("");
     };
 
-    // DnD: global drop monitor
+    // DnD: global drop monitor — handles both within-group reorder and cross-group date assignment
     useEffect(() => {
         if (!hasPermissions) return;
         return monitorForElements({
@@ -218,27 +217,52 @@ const EntryShow = ({ urlID, refresh, onRefresh, hasPermissions = false, extraCon
                 if (!target) return;
                 const { id: sourceId, dateKey: sourceDateKey } = source.data;
                 const { id: targetId, dateKey: targetDateKey } = target.data;
-                if (!sourceDateKey || sourceDateKey !== targetDateKey || sourceId === targetId) return;
+                if (sourceId === targetId) return;
+
+                const isCrossGroup = sourceDateKey !== targetDateKey;
+                const newDate = isCrossGroup
+                    ? (targetDateKey === 'unscheduled' ? null : targetDateKey)
+                    : undefined;
 
                 setData(prev => {
-                    const groupItems = prev.filter(item => (item.date || 'unscheduled') === sourceDateKey);
-                    const sourceIdx = groupItems.findIndex(i => i.id === sourceId);
-                    const targetIdx = groupItems.findIndex(i => i.id === targetId);
-                    if (sourceIdx === -1 || targetIdx === -1) return prev;
+                    const sourceEntry = prev.find(i => i.id === sourceId);
+                    if (!sourceEntry) return prev;
 
-                    const reordered = [...groupItems];
-                    const [moved] = reordered.splice(sourceIdx, 1);
-                    reordered.splice(targetIdx, 0, moved);
-                    const updated = reordered.map((item, idx) => ({ ...item, sort_order: idx }));
+                    const movedEntry = isCrossGroup
+                        ? { ...sourceEntry, date: newDate }
+                        : { ...sourceEntry };
 
-                    apiClient.post(`/travel/d/${id}/reorder/`, updated.map(item => ({ id: item.id, sort_order: item.sort_order })))
-                        .catch(err => console.error("Reorder failed:", err));
+                    // Build ordered group map from data minus the dragged entry
+                    const withoutSource = prev.filter(i => i.id !== sourceId);
+                    const groupOrder = [];
+                    const groupMap = new Map();
+                    for (const item of withoutSource) {
+                        const key = item.date || 'unscheduled';
+                        if (!groupMap.has(key)) { groupMap.set(key, []); groupOrder.push(key); }
+                        groupMap.get(key).push(item);
+                    }
 
-                    // Merge reordered group back into full data array preserving other groups' positions
-                    let groupPtr = 0;
-                    return prev.map(item =>
-                        (item.date || 'unscheduled') === sourceDateKey ? updated[groupPtr++] : item
-                    );
+                    // Insert movedEntry at the target row's position within the target group
+                    if (!groupMap.has(targetDateKey)) { groupMap.set(targetDateKey, []); groupOrder.push(targetDateKey); }
+                    const targetGroup = groupMap.get(targetDateKey);
+                    const targetIdx = targetGroup.findIndex(i => i.id === targetId);
+                    targetGroup.splice(targetIdx === -1 ? targetGroup.length : targetIdx, 0, movedEntry);
+
+                    // Assign sequential sort_order to the updated target group
+                    const updatedTargetGroup = targetGroup.map((item, idx) => ({ ...item, sort_order: idx }));
+                    groupMap.set(targetDateKey, updatedTargetGroup);
+
+                    // Persist: PATCH the date if cross-group, then reorder target group
+                    if (isCrossGroup) {
+                        apiClient.patch(`/travel/${sourceId}/update/`, { date: newDate })
+                            .catch(err => console.error("Cross-group date update failed:", err));
+                    }
+                    apiClient.post(`/travel/d/${id}/reorder/`,
+                        updatedTargetGroup.map(e => ({ id: e.id, sort_order: e.sort_order }))
+                    ).catch(err => console.error("Reorder failed:", err));
+
+                    // Flatten all groups back preserving their original relative order
+                    return groupOrder.flatMap(key => groupMap.get(key));
                 });
             }
         });

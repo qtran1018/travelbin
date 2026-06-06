@@ -23,6 +23,8 @@ Part of the [travel platform](https://github.com/qtran1018/travel-platform-infra
 - Create and manage travel destinations with collaborative entry tables
 - Invite collaborators via shareable links
 - Editable entry table with auto-save (name, location, type, date, notes)
+- **Day-grouped entries** — itinerary entries are grouped into per-day sections sorted chronologically, with an Unscheduled group for undated entries
+- **Drag-and-drop reordering** — reorder entries within a day, or drag across day groups to assign a new date to the entry
 - Import AI-generated itineraries from Itinerary-Agent
 - SSO login shared across all platform apps via Keycloak
 
@@ -70,9 +72,14 @@ npm run dev                    # port 3001
 ### Docker (combined platform mode)
 
 ```bash
-# From travel-platform-infra: start Keycloak + shared Postgres first
-POSTGRES_HOST=platform-postgres docker compose up -d
+# Start Keycloak + shared Postgres first (from keycloak-service/ and postgres-service/)
+# Then, from TravelBin/:
+docker compose build   # uses docker-compose.override.yml automatically (localhost URLs)
+docker compose up -d
+docker exec travelbin-backend python manage.py migrate
 ```
+
+> Always use plain `docker compose` (no `-f`) for local dev. The override file sets localhost URLs for `VITE_API_URL` and `VITE_KEYCLOAK_URL` baked into the static frontend build. Running `docker compose -f docker-compose.yml` explicitly skips the override and bakes production URLs instead.
 
 ---
 
@@ -93,6 +100,9 @@ POSTGRES_HOST=platform-postgres docker compose up -d
 | Variable | Description |
 |---|---|
 | `VITE_API_URL` | Backend URL (`http://localhost:8000`) |
+| `VITE_KEYCLOAK_URL` | Keycloak base URL (`http://localhost:8180`) |
+
+> In Docker, these are baked as build `ARG`s at image build time (not read at runtime). `docker-compose.override.yml` supplies localhost values for local dev; `docker-compose.yml` supplies production values.
 
 ---
 
@@ -107,7 +117,8 @@ POSTGRES_HOST=platform-postgres docker compose up -d
 | DELETE | `/travel/d/<pk>/delete/` | ✓ | Delete destination |
 | GET | `/travel/d/<id>/` | — | List entries |
 | POST | `/travel/d/<pk>/create_entry/` | ✓ | Add entry |
-| PATCH | `/travel/<pk>/update/` | ✓ | Update entry |
+| POST | `/travel/d/<id>/reorder/` | ✓ | Batch-reorder entries (drag-and-drop) |
+| PATCH | `/travel/<pk>/update/` | ✓ | Update entry (supports `date` + `sort_order`) |
 | DELETE | `/travel/<pk>/delete/` | ✓ | Delete entry |
 | GET | `/travel/me/` | ✓ | Current user |
 | POST | `/travel/destinations/import/` | ✓ | Import from Itinerary-Agent |
