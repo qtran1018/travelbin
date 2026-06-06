@@ -6,18 +6,15 @@ import { useAuth } from "../components/AuthContext";
 const Home = () => {
 
     // const [isLoggedIn, setIsLoggedIn] = useState(false);
-    const {user} = useAuth();
-    
-    // Redirect to profile if user is logged in
+    const { user, authLoading } = useAuth();
+
+    if (authLoading) return null;
+
     if (user) {
         return <Navigate to={`/u/${user.username}`} replace />;
     }
-    
-    return (
-        <>
-            <LoggedOutHome />
-        </>
-    );
+
+    return <LoggedOutHome />;
 };
 
 const LoggedInHome = ({ user }) => (
