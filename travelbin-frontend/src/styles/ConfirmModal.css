@@ -1,0 +1,96 @@
+.cm-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.45);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 400;
+    animation: cm-fade-in 0.15s ease;
+}
+
+@keyframes cm-fade-in {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+}
+
+.cm-panel {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 14px;
+    box-shadow: var(--shadow-xl);
+    width: calc(100% - 2rem);
+    max-width: 380px;
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    animation: cm-slide-up 0.18s ease;
+}
+
+@keyframes cm-slide-up {
+    from { transform: translateY(10px); opacity: 0; }
+    to   { transform: translateY(0);    opacity: 1; }
+}
+
+.cm-title {
+    margin: 0;
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: var(--text-color);
+}
+
+.cm-message {
+    margin: 0;
+    font-size: 0.9rem;
+    color: var(--text-color);
+    opacity: 0.7;
+    line-height: 1.4;
+}
+
+.cm-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.5rem;
+    margin-top: 0.25rem;
+}
+
+.cm-btn {
+    padding: 0.45rem 1.1rem;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    border: 1px solid var(--border-color);
+    transition: opacity 0.15s ease, background 0.15s ease;
+}
+
+.cm-btn--cancel {
+    background: transparent;
+    color: var(--text-color);
+}
+
+.cm-btn--cancel:hover {
+    background: var(--secondary-color);
+}
+
+.cm-btn--confirm {
+    background: #c0392b;
+    color: #fff;
+    border-color: transparent;
+}
+
+.cm-btn--confirm:hover {
+    opacity: 0.85;
+}
+
+@media (max-width: 480px) {
+    .cm-actions {
+        flex-direction: column-reverse;
+    }
+    .cm-btn {
+        width: 100%;
+        padding: 0.6rem;
+        text-align: center;
+    }
+}
