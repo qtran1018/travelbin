@@ -497,6 +497,18 @@ const EntryShow = ({ urlID, refresh, onRefresh, hasPermissions = false, extraCon
                         </section>
                     ))
                 )}
+
+                {showAddModal && (
+                    <AddEntryModal
+                        newEntry={newEntry}
+                        setNewEntry={setNewEntry}
+                        onCreate={handleCreate}
+                        creating={creating}
+                        nameError={nameError}
+                        setNameError={setNameError}
+                        onCancel={() => { setShowAddModal(false); setNameError(false); }}
+                    />
+                )}
             </>
         );
     }
@@ -557,17 +569,6 @@ const EntryShow = ({ urlID, refresh, onRefresh, hasPermissions = false, extraCon
                     </section>
                 ))
             )}
-        {showAddModal && (
-            <AddEntryModal
-                newEntry={newEntry}
-                setNewEntry={setNewEntry}
-                onCreate={handleCreate}
-                creating={creating}
-                nameError={nameError}
-                setNameError={setNameError}
-                onCancel={() => { setShowAddModal(false); setNameError(false); }}
-            />
-        )}
         </>
     );
 };
