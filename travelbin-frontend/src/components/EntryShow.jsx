@@ -2,6 +2,7 @@ import React, { useEffect, useState, useRef, useCallback, useMemo } from "react"
 import '../styles/Table.css';
 import EntryDelete from "./EntryDelete";
 import AddEntryModal from "./AddEntryModal";
+import ConfirmModal from "./ConfirmModal";
 import { draggable, dropTargetForElements, monitorForElements } from '@atlaskit/pragmatic-drag-and-drop/element/adapter';
 import { useAuth } from "./AuthContext";
 import { apiClient } from "../config/api";
@@ -28,13 +29,66 @@ function groupByDate(entries) {
     });
 }
 
+// ---- Type filter multi-select dropdown ----
+
+const TYPE_OPTIONS = ['Food & Drink', 'Shopping', 'Activity', 'Sightseeing', 'Other'];
+
+const TypeFilterDropdown = ({ selectedTypes, onChange }) => {
+    const [open, setOpen] = useState(false);
+    const ref = useRef(null);
+
+    useEffect(() => {
+        if (!open) return;
+        const handler = (e) => { if (ref.current && !ref.current.contains(e.target)) setOpen(false); };
+        document.addEventListener('mousedown', handler);
+        return () => document.removeEventListener('mousedown', handler);
+    }, [open]);
+
+    const toggle = (type) => {
+        const next = new Set(selectedTypes);
+        next.has(type) ? next.delete(type) : next.add(type);
+        onChange(next);
+    };
+
+    const label = selectedTypes.size === 0 ? 'Type'
+        : selectedTypes.size === 1 ? [...selectedTypes][0]
+        : `Type · ${selectedTypes.size}`;
+
+    return (
+        <div className="type-filter-wrap" ref={ref}>
+            <button
+                type="button"
+                className={`type-filter-btn${selectedTypes.size > 0 ? ' type-filter-btn--active' : ''}`}
+                onClick={() => setOpen(o => !o)}
+            >
+                {label} <span className="type-filter-chevron">{open ? '▲' : '▼'}</span>
+            </button>
+            {open && (
+                <div className="type-filter-panel">
+                    {TYPE_OPTIONS.map(type => (
+                        <label key={type} className="type-filter-option">
+                            <input type="checkbox" checked={selectedTypes.has(type)} onChange={() => toggle(type)} />
+                            {type}
+                        </label>
+                    ))}
+                    {selectedTypes.size > 0 && (
+                        <button type="button" className="type-filter-clear" onClick={() => onChange(new Set())}>
+                            Clear
+                        </button>
+                    )}
+                </div>
+            )}
+        </div>
+    );
+};
+
 // ---- EntryRow: one draggable/droppable editable table row ----
 
 const EntryRow = ({
     item, dateKey,
-    savingStatus, confirmDeleteId, deletingId, selectedItems,
+    savingStatus, selectedItems,
     onCheckboxChange, onHandleChange, onHandleResize,
-    onDeleteClick, onConfirmDelete, onCancelDelete,
+    onDeleteClick,
 }) => {
     const rowRef = useRef(null);
     const [isDragging, setIsDragging] = useState(false);
@@ -115,17 +169,8 @@ const EntryRow = ({
                     onInput={onHandleResize} onChange={e => onHandleChange(item.id, "notes", e.target.value)} />
             </td>
             <td data-label="Contributor">{item.contributor}</td>
-            <td className="actions-cell" data-label="Actions">
-                {confirmDeleteId === item.id ? (
-                    <div className="delete-confirm-buttons">
-                        <button type="button" className="icon-button confirm-delete-button"
-                            onClick={() => onConfirmDelete(item.id)} disabled={deletingId === item.id}>✓</button>
-                        <button type="button" className="icon-button cancel-delete-button"
-                            onClick={onCancelDelete} disabled={deletingId === item.id}>✕</button>
-                    </div>
-                ) : (
-                    <button type="button" className="trash-button" onClick={() => onDeleteClick(item.id)}>🗑️</button>
-                )}
+            <td className="actions-cell" data-label="">
+                <button type="button" className="trash-button" onClick={() => onDeleteClick(item.id)}>🗑️</button>
             </td>
         </tr>
     );
@@ -140,7 +185,7 @@ const EntryShow = ({ urlID, refresh, onRefresh, hasPermissions = false, extraCon
     const [originalData, setOriginalData] = useState([]);
 
     const [searchName, setSearchName] = useState("");
-    const [searchType, setSearchType] = useState("");
+    const [selectedTypes, setSelectedTypes] = useState(new Set());
     const [searchLocation, setSearchLocation] = useState("");
     const [searchDate, setSearchDate] = useState("");
     const [searchNotes, setSearchNotes] = useState("");
@@ -153,8 +198,7 @@ const EntryShow = ({ urlID, refresh, onRefresh, hasPermissions = false, extraCon
 
     const [selectedItems, setSelectedItems] = useState([]);
     const [savingStatus, setSavingStatus] = useState({});
-    const [confirmDeleteId, setConfirmDeleteId] = useState(null);
-    const [deletingId, setDeletingId] = useState(null);
+    const [deleteTargetId, setDeleteTargetId] = useState(null);
     const saveTimeouts = useRef({});
     const pollInterval = useRef(null);
 
@@ -198,15 +242,16 @@ const EntryShow = ({ urlID, refresh, onRefresh, hasPermissions = false, extraCon
     // Filter then group
     const filteredData = useMemo(() => data.filter(item => {
         const q = (v, s) => !s || (v ?? '').toLowerCase().includes(s.toLowerCase());
-        return q(item.name, searchName) && q(item.type, searchType) &&
+        return q(item.name, searchName) &&
+            (selectedTypes.size === 0 || selectedTypes.has(item.type)) &&
             q(item.location, searchLocation) && q(item.date, searchDate) &&
             q(item.notes, searchNotes) && q(item.contributor, searchContributor);
-    }), [data, searchName, searchType, searchLocation, searchDate, searchNotes, searchContributor]);
+    }), [data, searchName, selectedTypes, searchLocation, searchDate, searchNotes, searchContributor]);
 
     const groupedDays = useMemo(() => groupByDate(filteredData), [filteredData]);
 
     const reset = () => {
-        setSearchName(""); setSearchType(""); setSearchLocation("");
+        setSearchName(""); setSelectedTypes(new Set()); setSearchLocation("");
         setSearchDate(""); setSearchNotes(""); setSearchContributor("");
     };
 
@@ -276,17 +321,14 @@ const EntryShow = ({ urlID, refresh, onRefresh, hasPermissions = false, extraCon
     };
 
     // Delete
-    const handleDeleteClick = (itemId) => setConfirmDeleteId(itemId);
-    const handleCancelDelete = () => setConfirmDeleteId(null);
-    const handleConfirmDelete = async (itemId) => {
-        setDeletingId(itemId);
+    const handleDeleteClick = (itemId) => setDeleteTargetId(itemId);
+    const handleConfirmDelete = async () => {
         try {
-            await apiClient.delete(`/travel/${itemId}/delete/`);
+            await apiClient.delete(`/travel/${deleteTargetId}/delete/`);
         } catch (error) {
             console.error("Error deleting entry:", error);
         } finally {
-            setDeletingId(null);
-            setConfirmDeleteId(null);
+            setDeleteTargetId(null);
             onRefresh();
         }
     };
@@ -345,13 +387,11 @@ const EntryShow = ({ urlID, refresh, onRefresh, hasPermissions = false, extraCon
 
     // Shared row handler props
     const rowHandlers = {
-        savingStatus, confirmDeleteId, deletingId, selectedItems,
+        savingStatus, selectedItems,
         onCheckboxChange: handleCheckboxChange,
         onHandleChange: handleChange,
         onHandleResize: handleResize,
         onDeleteClick: handleDeleteClick,
-        onConfirmDelete: handleConfirmDelete,
-        onCancelDelete: handleCancelDelete,
     };
 
     // Column headers (editable view)
@@ -402,7 +442,7 @@ const EntryShow = ({ urlID, refresh, onRefresh, hasPermissions = false, extraCon
                 {/* Filter bar */}
                 <div className="entry-filter-bar">
                     <input type="text" placeholder="Name…" value={searchName} onChange={e => setSearchName(e.target.value)} />
-                    <input type="text" placeholder="Type…" value={searchType} onChange={e => setSearchType(e.target.value)} />
+                    <TypeFilterDropdown selectedTypes={selectedTypes} onChange={setSelectedTypes} />
                     <input type="text" placeholder="Location…" value={searchLocation} onChange={e => setSearchLocation(e.target.value)} />
                     <input type="date" value={searchDate} onChange={e => setSearchDate(e.target.value)} title="Filter by date" />
                     <input type="text" placeholder="Notes…" value={searchNotes} onChange={e => setSearchNotes(e.target.value)} />
@@ -496,6 +536,16 @@ const EntryShow = ({ urlID, refresh, onRefresh, hasPermissions = false, extraCon
                             </table>
                         </section>
                     ))
+                )}
+
+                {deleteTargetId && (
+                    <ConfirmModal
+                        title="Delete entry?"
+                        message="This entry will be permanently removed."
+                        confirmLabel="Delete"
+                        onConfirm={handleConfirmDelete}
+                        onCancel={() => setDeleteTargetId(null)}
+                    />
                 )}
 
                 {showAddModal && (
