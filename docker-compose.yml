@@ -30,14 +30,14 @@ services:
         condition: service_healthy
         required: false
     ports:
-      - "8000:8000"
+      - "127.0.0.1:8000:8000"
     environment:
       POSTGRES_DB: travelbin
       POSTGRES_USER: travelbin
       POSTGRES_PASSWORD: ${TRAVELBIN_DB_PASSWORD:-travelbin}
       DB_HOST: ${POSTGRES_HOST:-platform-postgres}
       DB_PORT: 5432
-      SECRET_KEY: ${DJANGO_SECRET_KEY:-django-insecure-*ba^c%!mo3-k#_ev#9va4sgm2=uj4)-k793ddaiisiswougjcn}
+      SECRET_KEY: ${DJANGO_SECRET_KEY:?DJANGO_SECRET_KEY not set}
       DEBUG: "False"
       ALLOWED_HOSTS: localhost,127.0.0.1,travelbin-backend,0.0.0.0,travelbin-api.quangntran.com
       KEYCLOAK_ISSUER: https://auth.quangntran.com/realms/travel-platform
