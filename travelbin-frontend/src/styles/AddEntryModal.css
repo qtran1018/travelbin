@@ -1,0 +1,205 @@
+.aem-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.45);
+    display: flex;
+    align-items: flex-end;      /* bottom sheet on mobile */
+    justify-content: center;
+    z-index: 400;
+    animation: aem-fade-in 0.15s ease;
+}
+
+@keyframes aem-fade-in {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+}
+
+.aem-sheet {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 16px 16px 0 0;
+    box-shadow: var(--shadow-xl);
+    width: 100%;
+    max-height: 92dvh;
+    display: flex;
+    flex-direction: column;
+    animation: aem-slide-up 0.22s ease;
+    overflow: hidden;
+}
+
+@keyframes aem-slide-up {
+    from { transform: translateY(40px); opacity: 0; }
+    to   { transform: translateY(0);    opacity: 1; }
+}
+
+.aem-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem 1.25rem 0.75rem;
+    border-bottom: 1px solid var(--border-color);
+    flex-shrink: 0;
+}
+
+.aem-title {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-color);
+}
+
+.aem-close {
+    background: none;
+    border: none;
+    font-size: 1rem;
+    color: var(--text-color);
+    opacity: 0.55;
+    cursor: pointer;
+    padding: 0.2rem 0.4rem;
+    border-radius: 4px;
+    line-height: 1;
+    box-shadow: none;
+}
+
+.aem-close:hover {
+    opacity: 1;
+    transform: none;
+    box-shadow: none;
+    background: var(--secondary-color);
+}
+
+.aem-body {
+    display: flex;
+    flex-direction: column;
+    gap: 0.85rem;
+    padding: 1rem 1.25rem;
+    overflow-y: auto;
+    flex: 1;
+}
+
+.aem-label {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+    font-size: 0.82rem;
+    font-weight: 500;
+    color: var(--text-color);
+    opacity: 0.8;
+}
+
+.aem-required {
+    color: var(--error-color, #c0392b);
+}
+
+.aem-input {
+    padding: 0.5rem 0.65rem;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    background: var(--secondary-color);
+    color: var(--text-color);
+    font-size: 0.95rem;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.aem-input:focus {
+    outline: none;
+    border-color: var(--border-hover);
+}
+
+.aem-input--error {
+    border-color: var(--error-color, #c0392b);
+}
+
+.aem-error-msg {
+    font-size: 0.78rem;
+    color: var(--error-color, #c0392b);
+    opacity: 1;
+}
+
+.aem-textarea {
+    resize: vertical;
+    min-height: 72px;
+    font-family: inherit;
+}
+
+.aem-footer {
+    display: flex;
+    gap: 0.6rem;
+    padding: 0.85rem 1.25rem 1.25rem;
+    border-top: 1px solid var(--border-color);
+    flex-shrink: 0;
+}
+
+.aem-btn {
+    flex: 1;
+    padding: 0.65rem;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    font-weight: 500;
+    cursor: pointer;
+    border: 1px solid var(--border-color);
+    transition: opacity 0.15s ease, background 0.15s ease;
+}
+
+.aem-btn--cancel {
+    background: transparent;
+    color: var(--text-color);
+}
+
+.aem-btn--cancel:hover {
+    background: var(--secondary-color);
+}
+
+.aem-btn--save {
+    background: var(--primary-color, #2c6fad);
+    color: #fff;
+    border-color: transparent;
+}
+
+.aem-btn--save:hover:not(:disabled) {
+    opacity: 0.88;
+}
+
+.aem-btn--save:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Mobile add-entry trigger button — hidden on desktop */
+.add-entry-mobile-btn {
+    display: none;
+}
+
+@media (max-width: 768px) {
+    /* Hide inline new-entry table on mobile */
+    .new-entry-table {
+        display: none;
+    }
+
+    /* Show the mobile trigger button */
+    .add-entry-mobile-btn {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        width: 100%;
+        padding: 0.65rem 1rem;
+        margin-bottom: 1rem;
+        border-radius: 10px;
+        border: 1.5px dashed var(--border-color);
+        background: transparent;
+        color: var(--text-color);
+        font-size: 0.9rem;
+        cursor: pointer;
+        justify-content: center;
+        opacity: 0.7;
+        box-shadow: none;
+        transition: opacity 0.15s, border-color 0.15s;
+    }
+
+    .add-entry-mobile-btn:hover {
+        opacity: 1;
+        border-color: var(--border-hover);
+        transform: none;
+        box-shadow: none;
+    }
+}

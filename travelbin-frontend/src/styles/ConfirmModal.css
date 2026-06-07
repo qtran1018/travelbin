@@ -50,7 +50,7 @@
 
 .cm-actions {
     display: flex;
-    justify-content: flex-end;
+    justify-content: center;
     gap: 0.5rem;
     margin-top: 0.25rem;
 }

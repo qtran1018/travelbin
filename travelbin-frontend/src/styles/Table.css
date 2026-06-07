@@ -350,10 +350,12 @@ td input[type="checkbox"]:hover {
     text-align: center;
 }
 
-/* Hide per-row actions column on desktop; used only for mobile cards */
 .entry-table .actions-header,
 .entry-table .actions-cell {
-    display: none;
+    width: 56px;
+    min-width: 56px;
+    text-align: center;
+    vertical-align: middle;
 }
 
 .delete-confirm-buttons {
@@ -924,7 +926,7 @@ td a:hover {
     background: var(--card-bg);
     color: var(--text-color);
     font-size: 1.1rem;
-    line-height: 1;
+    line-height: 0;
     cursor: pointer;
     display: inline-flex;
     align-items: center;

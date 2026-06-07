@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useRef, useCallback, useMemo } from "react";
 import '../styles/Table.css';
 import EntryDelete from "./EntryDelete";
+import AddEntryModal from "./AddEntryModal";
 import { draggable, dropTargetForElements, monitorForElements } from '@atlaskit/pragmatic-drag-and-drop/element/adapter';
 import { useAuth } from "./AuthContext";
 import { apiClient } from "../config/api";
@@ -148,6 +149,7 @@ const EntryShow = ({ urlID, refresh, onRefresh, hasPermissions = false, extraCon
     const [newEntry, setNewEntry] = useState({ name: '', type: '', location: '', date: '', notes: '' });
     const [nameError, setNameError] = useState(false);
     const [creating, setCreating] = useState(false);
+    const [showAddModal, setShowAddModal] = useState(false);
 
     const [selectedItems, setSelectedItems] = useState([]);
     const [savingStatus, setSavingStatus] = useState({});
@@ -332,6 +334,7 @@ const EntryShow = ({ urlID, refresh, onRefresh, hasPermissions = false, extraCon
                 destination: id,
             });
             setNewEntry({ name: '', type: '', location: '', date: '', notes: '' });
+            setShowAddModal(false);
             onRefresh();
         } catch (error) {
             console.error('Error creating entry:', error);
@@ -466,6 +469,13 @@ const EntryShow = ({ urlID, refresh, onRefresh, hasPermissions = false, extraCon
                     </tbody>
                 </table>
 
+                {/* Mobile add-entry trigger (hidden on desktop via CSS) */}
+                {hasPermissions && (
+                    <button className="add-entry-mobile-btn" onClick={() => setShowAddModal(true)}>
+                        + Add Entry
+                    </button>
+                )}
+
                 {/* Day groups */}
                 {groupedDays.length === 0 ? (
                     <div className="entries-empty">No entries yet. Add one above.</div>
@@ -547,6 +557,17 @@ const EntryShow = ({ urlID, refresh, onRefresh, hasPermissions = false, extraCon
                     </section>
                 ))
             )}
+        {showAddModal && (
+            <AddEntryModal
+                newEntry={newEntry}
+                setNewEntry={setNewEntry}
+                onCreate={handleCreate}
+                creating={creating}
+                nameError={nameError}
+                setNameError={setNameError}
+                onCancel={() => { setShowAddModal(false); setNameError(false); }}
+            />
+        )}
         </>
     );
 };
