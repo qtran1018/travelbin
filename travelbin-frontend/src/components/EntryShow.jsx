@@ -576,7 +576,7 @@ const EntryShow = ({ urlID, refresh, onRefresh, hasPermissions = false, extraCon
 
             <div className="entry-filter-bar">
                 <input type="text" placeholder="Name…" value={searchName} onChange={e => setSearchName(e.target.value)} />
-                <input type="text" placeholder="Type…" value={searchType} onChange={e => setSearchType(e.target.value)} />
+                <TypeFilterDropdown selectedTypes={selectedTypes} onChange={setSelectedTypes} />
                 <input type="text" placeholder="Location…" value={searchLocation} onChange={e => setSearchLocation(e.target.value)} />
                 <input type="date" value={searchDate} onChange={e => setSearchDate(e.target.value)} title="Filter by date" />
                 <input type="text" placeholder="Notes…" value={searchNotes} onChange={e => setSearchNotes(e.target.value)} />
