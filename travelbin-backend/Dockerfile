@@ -17,4 +17,7 @@ RUN pip install -r requirements.txt
 COPY . /app/
 
 EXPOSE 8000
-CMD ["gunicorn", "Teyvat.wsgi:application", "--bind", "0.0.0.0:8000", "--workers", "2"]
+# Worker/thread counts are env-tunable (no rebuild needed to change them).
+# Defaults: 3 sync-ish workers x 2 threads = ~6 concurrent requests.
+# `exec` so gunicorn becomes PID 1 and receives stop/restart signals directly.
+CMD ["sh", "-c", "exec gunicorn Teyvat.wsgi:application --bind 0.0.0.0:8000 --workers ${GUNICORN_WORKERS:-3} --threads ${GUNICORN_THREADS:-2} --timeout 60"]
