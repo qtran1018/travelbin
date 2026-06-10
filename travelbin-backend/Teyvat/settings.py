@@ -156,6 +156,15 @@ DATABASES = {
         'PASSWORD': 'travelbin',
         'HOST': os.getenv('DB_HOST', 'localhost'),
         'PORT': os.getenv('DB_PORT', '5433'),
+        # NOTE: do NOT set CONN_MAX_AGE with a pool — Django rejects persistent
+        # connections when pooling is enabled. The pool handles connection reuse.
+        "OPTIONS": {
+            "pool": {                # Django 5.1 native psycopg3 pool (needs psycopg[pool])
+                "min_size": 2,
+                "max_size": 10,
+                "timeout": 10,
+            }
+        }
     }
 }
 
